@@ -1,0 +1,17 @@
+@import url('./main-layout.css');
+@import url('./views/books-view.css');
+@import url('./views/authors-view.css');
+@import url('./views/tags-view.css');
+@import url('./views/series-view.css');
+@import url('./views/book-edit-view.css');
+@import url('./views/create-user-view.css');
+@import url('line-awesome/dist/line-awesome/css/line-awesome.min.css');    html {
+      --lumo-border-radius-s: calc(var(--lumo-size-m) / 6);
+      --lumo-border-radius-m: calc(var(--lumo-size-m) / 2);
+      --lumo-border-radius-l: var(--lumo-size-m);
+
+    }
+
+    [theme~="dark"] {
+
+    }
