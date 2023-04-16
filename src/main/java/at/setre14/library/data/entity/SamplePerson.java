@@ -1,8 +1,8 @@
 package at.setre14.library.data.entity;
 
-import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.validation.constraints.Email;
+import java.time.LocalDate;
 
 @Entity
 public class SamplePerson extends AbstractEntity {

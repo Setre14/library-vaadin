@@ -1,11 +1,11 @@
 package at.setre14.library.data.book;
 
-import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.author.Author;
-import at.setre14.library.data.userbooksettings.UserBookSetting;
-import at.setre14.library.model.Language;
+import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.series.Series;
 import at.setre14.library.data.tag.Tag;
+import at.setre14.library.data.userbooksettings.UserBookSetting;
+import at.setre14.library.model.Language;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,6 +52,17 @@ public class Book extends DbItem {
         this.userBookSettingIds = new ArrayList<>();
     }
 
+    public Book(String name) {
+        super(name);
+        this.authorId = UUID.randomUUID().toString();
+        this.tagIds = new ArrayList<>();
+        this.seriesId = UUID.randomUUID().toString();
+        this.seriesIndex = 1;
+        this.description = "description";
+        this.language = Language.GERMAN;
+        this.userBookSettingIds = new ArrayList<>();
+    }
+
     public Book(String name, DbItem authorId, String description, Language language, List<DbItem> tagIds, DbItem seriesId, int seriesIndex) {
         this();
         this.name = name;
@@ -67,4 +78,10 @@ public class Book extends DbItem {
         return String.format("%s:%s", name, authorId);
     }
 
+    public List<Tag> getSortedTags() {
+        if(this.tags != null) {
+            return tags.stream().sorted(Comparator.comparing(a -> a.getName().toLowerCase())).toList();
+        }
+        return new ArrayList<>();
+    }
 }

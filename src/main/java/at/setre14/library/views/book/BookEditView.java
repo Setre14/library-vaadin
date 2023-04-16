@@ -1,11 +1,11 @@
-package at.setre14.library.views.bookedit;
+package at.setre14.library.views.book;
 
 import at.setre14.library.data.author.Author;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.series.Series;
 import at.setre14.library.data.service.SamplePersonService;
 import at.setre14.library.data.tag.Tag;
-import at.setre14.library.model.*;
+import at.setre14.library.model.ReadingStatus;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -23,14 +23,16 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+import javax.annotation.security.RolesAllowed;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +40,7 @@ import java.util.List;
 
 @PageTitle("Book Edit")
 @Route(value = "book-edit", layout = MainLayout.class)
-@AnonymousAllowed
+@RolesAllowed("USER")
 @Uses(Icon.class)
 public class BookEditView extends Div {
 
@@ -124,7 +126,6 @@ public class BookEditView extends Div {
 //            personService.update(binder.getBean());
             Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
             Book book = binder.getBean();
-            System.out.println(book.toString());
             clearForm();
         });
     }
@@ -188,8 +189,6 @@ public class BookEditView extends Div {
         ebook.addSucceededListener(event -> {
             String fileName = event.getFileName();
             InputStream inputStream = buffer.getInputStream();
-
-            System.out.println(fileName);
 
             // Do something with the file data
             // processFile(inputStream, fileName);

@@ -3,9 +3,10 @@ package at.setre14.library.security;
 import at.setre14.library.data.entity.User;
 import at.setre14.library.data.service.UserRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
-import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class AuthenticatedUser {

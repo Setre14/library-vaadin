@@ -1,7 +1,7 @@
-package at.setre14.library.views.series;
+package at.setre14.library.views.tags;
 
-import at.setre14.library.data.series.Series;
-import at.setre14.library.data.series.SeriesService;
+import at.setre14.library.data.tag.Tag;
+import at.setre14.library.data.tag.TagService;
 import at.setre14.library.views.DbItemView;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.dependency.Uses;
@@ -12,17 +12,17 @@ import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
 
 @PageTitle("Book")
-@Route(value = "series", layout = MainLayout.class)
+@Route(value = "tag", layout = MainLayout.class)
 @RolesAllowed("USER")
 @Uses(Icon.class)
-public class SeriesView extends DbItemView<Series> {
+public class TagView extends DbItemView<Tag> {
 
-    public SeriesView(SeriesService service) {
+    public TagView(TagService service) {
         super(service);
     }
 
     @Override
-    protected Series createItem() {
-        return new Series("New Series");
+    protected Tag createItem() {
+        return new Tag("New Tag");
     }
 }

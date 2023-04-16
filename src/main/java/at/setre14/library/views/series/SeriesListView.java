@@ -1,4 +1,4 @@
-package at.setre14.library.views.tags;
+package at.setre14.library.views.series;
 
 import at.setre14.library.data.entity.SamplePerson;
 import at.setre14.library.data.service.SamplePersonService;
@@ -26,31 +26,28 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
-@PageTitle("Tags")
-@Route(value = "tags", layout = MainLayout.class)
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@PageTitle("Series")
+@Route(value = "series-list", layout = MainLayout.class)
 @AnonymousAllowed
 @Uses(Icon.class)
-public class TagsView extends Div {
+public class SeriesListView extends Div {
 
     private Grid<SamplePerson> grid;
 
-    private Filters filters;
+    private final Filters filters;
     private final SamplePersonService samplePersonService;
 
-    public TagsView(SamplePersonService SamplePersonService) {
+    public SeriesListView(SamplePersonService SamplePersonService) {
         this.samplePersonService = SamplePersonService;
         setSizeFull();
-        addClassNames("tags-view");
+        addClassNames("series-view");
 
         filters = new Filters(() -> refreshGrid());
         VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
@@ -207,7 +204,7 @@ public class TagsView extends Div {
         private String ignoreCharacters(String characters, String in) {
             String result = in;
             for (int i = 0; i < characters.length(); i++) {
-                result = result.replace("" + characters.charAt(i), "");
+                result = result.replace(String.valueOf(characters.charAt(i)), "");
             }
             return result;
         }

@@ -1,7 +1,5 @@
-package at.setre14.library.views.books;
+package at.setre14.library.views.tags;
 
-import at.setre14.library.data.book.Book;
-import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.entity.SamplePerson;
 import at.setre14.library.data.service.SamplePersonService;
 import at.setre14.library.views.MainLayout;
@@ -25,37 +23,31 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.security.RolesAllowed;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-@PageTitle("Books")
-@Route(value = "books", layout = MainLayout.class)
-@RouteAlias(value = "", layout = MainLayout.class)
-@RolesAllowed("USER")
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@PageTitle("Tags")
+@Route(value = "tag-list", layout = MainLayout.class)
+@AnonymousAllowed
 @Uses(Icon.class)
-public class BooksView extends Div {
+public class TagListView extends Div {
 
-    private Grid<Book> grid;
+    private Grid<SamplePerson> grid;
 
-    private Filters filters;
-    private final BookService bookService;
+    private final Filters filters;
+    private final SamplePersonService samplePersonService;
 
-    public BooksView(BookService bookService) {
-        this.bookService = bookService;
+    public TagListView(SamplePersonService SamplePersonService) {
+        this.samplePersonService = SamplePersonService;
         setSizeFull();
-        addClassNames("books-view");
+        addClassNames("tags-view");
 
         filters = new Filters(() -> refreshGrid());
         VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
@@ -91,7 +83,7 @@ public class BooksView extends Div {
 
     public static class Filters extends Div implements Specification<SamplePerson> {
 
-        private final TextField name = new TextField("Title");
+        private final TextField name = new TextField("Name");
         private final TextField phone = new TextField("Phone");
         private final DatePicker startDate = new DatePicker("Date of Birth");
         private final DatePicker endDate = new DatePicker();
@@ -212,7 +204,7 @@ public class BooksView extends Div {
         private String ignoreCharacters(String characters, String in) {
             String result = in;
             for (int i = 0; i < characters.length(); i++) {
-                result = result.replace("" + characters.charAt(i), "");
+                result = result.replace(String.valueOf(characters.charAt(i)), "");
             }
             return result;
         }
@@ -230,19 +222,18 @@ public class BooksView extends Div {
     }
 
     private Component createGrid() {
-        grid = new Grid<>(Book.class, false);
-        grid.addColumn("name").setHeader("Title").setAutoWidth(true);
-//        grid.addColumn("lastName").setAutoWidth(true);
-//        grid.addColumn("email").setAutoWidth(true);
-//        grid.addColumn("phone").setAutoWidth(true);
-//        grid.addColumn("dateOfBirth").setAutoWidth(true);
-//        grid.addColumn("occupation").setAutoWidth(true);
-//        grid.addColumn("role").setAutoWidth(true);
+        grid = new Grid<>(SamplePerson.class, false);
+        grid.addColumn("firstName").setAutoWidth(true);
+        grid.addColumn("lastName").setAutoWidth(true);
+        grid.addColumn("email").setAutoWidth(true);
+        grid.addColumn("phone").setAutoWidth(true);
+        grid.addColumn("dateOfBirth").setAutoWidth(true);
+        grid.addColumn("occupation").setAutoWidth(true);
+        grid.addColumn("role").setAutoWidth(true);
 
-//        grid.setItems(query -> bookService.list(
-//                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
-//                filters).stream());
-        grid.setItems(bookService.findAll());
+        grid.setItems(query -> samplePersonService.list(
+                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
+                filters).stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addClassNames(LumoUtility.Border.TOP, LumoUtility.BorderColor.CONTRAST_10);
 

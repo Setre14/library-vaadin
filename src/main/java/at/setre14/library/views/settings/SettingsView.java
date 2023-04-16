@@ -1,12 +1,7 @@
 package at.setre14.library.views.settings;
 
-import at.setre14.library.calibre.CalibreService;
 import at.setre14.library.calibre.CalibreImport;
-import at.setre14.library.data.author.AuthorService;
-import at.setre14.library.data.book.BookService;
-import at.setre14.library.data.series.SeriesService;
-import at.setre14.library.data.tag.TagService;
-import at.setre14.library.data.userbooksettings.UserBookSettingService;
+import at.setre14.library.calibre.CalibreService;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -22,7 +17,6 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,15 +43,6 @@ public class SettingsView extends VerticalLayout {
         upload.setAcceptedFileTypes(".zip");
         upload.setMaxFiles(1);
 
-        upload.addSucceededListener(event -> {
-            String fileName = event.getFileName();
-            InputStream inputStream = buffer.getInputStream();
-
-            System.out.println(fileName);
-
-            // Do something with the file data
-            // processFile(inputStream, fileName);
-        });
         upload.addFileRejectedListener(event -> {
             String errorMessage = event.getErrorMessage();
 
@@ -73,10 +58,6 @@ public class SettingsView extends VerticalLayout {
 
         upload.addSucceededListener(event -> {
             String fileName = event.getFileName();
-            InputStream inputStream = buffer.getInputStream();
-//            buffer.
-
-            System.out.println(fileName);
 
             File extractDir = Paths.get("/wsp/sandbox/library-dev/").toFile();
 

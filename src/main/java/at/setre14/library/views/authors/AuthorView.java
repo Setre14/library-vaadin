@@ -1,7 +1,7 @@
-package at.setre14.library.views.series;
+package at.setre14.library.views.authors;
 
-import at.setre14.library.data.series.Series;
-import at.setre14.library.data.series.SeriesService;
+import at.setre14.library.data.author.Author;
+import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.views.DbItemView;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.dependency.Uses;
@@ -12,17 +12,17 @@ import com.vaadin.flow.router.Route;
 import javax.annotation.security.RolesAllowed;
 
 @PageTitle("Book")
-@Route(value = "series", layout = MainLayout.class)
+@Route(value = "author", layout = MainLayout.class)
 @RolesAllowed("USER")
 @Uses(Icon.class)
-public class SeriesView extends DbItemView<Series> {
+public class AuthorView extends DbItemView<Author> {
 
-    public SeriesView(SeriesService service) {
+    public AuthorView(AuthorService service) {
         super(service);
     }
 
     @Override
-    protected Series createItem() {
-        return new Series("New Series");
+    protected Author createItem() {
+        return new Author("New Author");
     }
 }

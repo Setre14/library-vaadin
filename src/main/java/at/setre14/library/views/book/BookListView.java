@@ -1,11 +1,16 @@
-package at.setre14.library.views.authors;
+package at.setre14.library.views.book;
 
+import at.setre14.library.data.book.Book;
+import at.setre14.library.data.book.BookService;
+import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.entity.SamplePerson;
-import at.setre14.library.data.service.SamplePersonService;
-import at.setre14.library.data.author.Author;
-import at.setre14.library.data.author.AuthorService;
+import at.setre14.library.data.tag.Tag;
 import at.setre14.library.views.MainLayout;
+import at.setre14.library.views.authors.AuthorView;
+import at.setre14.library.views.series.SeriesView;
+import at.setre14.library.views.tags.TagView;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -22,54 +27,53 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import com.vaadin.flow.router.RouteAlias;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
-@PageTitle("Authors")
-@Route(value = "authors", layout = MainLayout.class)
-@AnonymousAllowed
+import javax.annotation.security.RolesAllowed;
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
+@PageTitle("Books")
+@Route(value = "book-list", layout = MainLayout.class)
+@RouteAlias(value = "", layout = MainLayout.class)
+@RolesAllowed("USER")
 @Uses(Icon.class)
-public class AuthorsView extends Div {
+public class BookListView extends Div {
 
-    private Grid<SamplePerson> grid;
+    private Grid<Book> grid;
 
-    private Filters filters;
-    private final SamplePersonService samplePersonService;
-    private final AuthorService authorService;
+    private int pageNumber = 1;
+    private final int pageSize = 20;
+    private int pagesTotal = 1;
+    private final Filters filters;
+    private final BookService bookService;
 
-
-    public AuthorsView(SamplePersonService SamplePersonService, AuthorService authorService) {
-        this.samplePersonService = SamplePersonService;
-        this.authorService = authorService;
+    public BookListView(BookService bookService) {
+        this.bookService = bookService;
         setSizeFull();
-        addClassNames("authors-view");
-
-        Author author = new Author("Name" + Math.random());
-        authorService.save(author);
-
-        System.out.println(authorService.count());
+        addClassNames("book-list-view");
 
         filters = new Filters(() -> refreshGrid());
-        VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
+        VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid(), createPaging());
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
         add(layout);
     }
+
 
     private HorizontalLayout createMobileFilters() {
         // Mobile version
@@ -97,7 +101,7 @@ public class AuthorsView extends Div {
 
     public static class Filters extends Div implements Specification<SamplePerson> {
 
-        private final TextField name = new TextField("Name");
+        private final TextField name = new TextField("Title");
         private final TextField phone = new TextField("Phone");
         private final DatePicker startDate = new DatePicker("Date of Birth");
         private final DatePicker endDate = new DatePicker();
@@ -218,7 +222,7 @@ public class AuthorsView extends Div {
         private String ignoreCharacters(String characters, String in) {
             String result = in;
             for (int i = 0; i < characters.length(); i++) {
-                result = result.replace("" + characters.charAt(i), "");
+                result = result.replace(String.valueOf(characters.charAt(i)), "");
             }
             return result;
         }
@@ -236,22 +240,115 @@ public class AuthorsView extends Div {
     }
 
     private Component createGrid() {
-        grid = new Grid<>(SamplePerson.class, false);
-        grid.addColumn("firstName").setAutoWidth(true);
-        grid.addColumn("lastName").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("phone").setAutoWidth(true);
-        grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
-        grid.addColumn("role").setAutoWidth(true);
+        grid = new Grid<>(Book.class, false);
+        grid.addColumn(createLinkHeaderComponentRenderer(BookView.class, book -> book)).setHeader("Title").setAutoWidth(true);
+        grid.addColumn(createLinkHeaderComponentRenderer(AuthorView.class, Book::getAuthor)).setHeader("Author").setAutoWidth(true);
+        grid.addColumn(createLinkHeaderComponentRenderer(SeriesView.class, Book::getSeries)).setHeader("Series").setAutoWidth(true);
+        grid.addColumn(createTagsComponentRenderer()).setHeader("Tags").setAutoWidth(true);
 
-        grid.setItems(query -> samplePersonService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
-                filters).stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addClassNames(LumoUtility.Border.TOP, LumoUtility.BorderColor.CONTRAST_10);
+        setGridItems();
 
         return grid;
+    }
+
+    private HorizontalLayout createPaging() {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+
+        IntegerField pageNumberIntegerField = new IntegerField();
+        pageNumberIntegerField.setMin(1);
+        pageNumberIntegerField.setMax(pagesTotal);
+        pageNumberIntegerField.setValue(pageNumber);
+
+        pageNumberIntegerField.addKeyUpListener(e -> {
+            if(Key.ENTER.equals(e.getKey())) {
+                pageNumber = pageNumberIntegerField.getValue();
+                if(pageNumber < 1) {
+                    pageNumber = 1;
+                } else if (pageNumber > pagesTotal) {
+                    pageNumber = pagesTotal;
+                }
+                pageNumberIntegerField.setValue(pageNumber);
+                setGridItems();
+            }
+        });
+
+        Button prevPageButton = new Button("<");
+        prevPageButton.addClickListener(e -> {
+            if(pageNumber > 1) {
+                pageNumber--;
+                pageNumberIntegerField.setValue(pageNumber);
+                setGridItems();
+            }
+        });
+
+
+
+        Span pagesTotalSpan = new Span(String.valueOf(pagesTotal));
+
+        Button nextPageButton = new Button(">");
+        nextPageButton.addClickListener(e -> {
+            pageNumber++;
+            pageNumberIntegerField.setValue(pageNumber);
+            setGridItems();
+        });
+
+        horizontalLayout.add(prevPageButton, pageNumberIntegerField, pagesTotalSpan, nextPageButton);
+
+        return horizontalLayout;
+    }
+
+//    private ComponentRenderer<RouterLink, Book> createTagsComponentRenderer() {
+//        return new ComponentRenderer<>(book -> {
+//            HorizontalLayout horizontalLayout = new HorizontalLayout();
+//            for(Tag tag: book.getSortedTags()) {
+//                Span tagSpan = new Span(tag.toString());
+//                tagSpan.getElement().getThemeList().add("badge");
+//
+//                RouterLink link = new RouterLink(tag.toString(), SettingsView.class);
+//                link.getElement().getThemeList().add("badge");
+//
+//                horizontalLayout.add(link);
+//            }
+//            return horizontalLayout;
+//        });
+//    }
+
+    private ComponentRenderer<RouterLink, Book> createLinkHeaderComponentRenderer(Class viewClass, Function<Book, DbItem> dbItemFunc) {
+        return new ComponentRenderer<>(book -> {
+            DbItem item = dbItemFunc.apply(book);
+            String id = item == null ? "" : item.getId();
+            String text = item == null ? "" : item.getName();
+
+            RouterLink link = new RouterLink(text, viewClass, id);
+
+            link.addClassName("grid-cell-link");
+
+            return link;
+        });
+    }
+    private ComponentRenderer<HorizontalLayout, Book> createTagsComponentRenderer() {
+        return new ComponentRenderer<>(book -> {
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            for(Tag tag: book.getSortedTags()) {
+                RouterLink link = new RouterLink(tag.toString(), TagView.class, tag.getId());
+                link.getElement().getThemeList().add("badge contrast");
+                link.addClassName("grid-cell-link");
+
+                horizontalLayout.add(link);
+            }
+            return horizontalLayout;
+        });
+    }
+
+    private void setGridItems() {
+        Sort.Order order = new Sort.Order(Sort.Direction.ASC, "name");
+        Page<Book> page = bookService.list(PageRequest.of(pageNumber, pageSize, Sort.by(order)));
+        pagesTotal = page.getTotalPages() - 1;
+
+        grid.setItems(page.getContent());
+        refreshGrid();
     }
 
     private void refreshGrid() {

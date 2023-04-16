@@ -4,23 +4,18 @@ import at.setre14.library.components.appnav.AppNav;
 import at.setre14.library.components.appnav.AppNavItem;
 import at.setre14.library.data.entity.User;
 import at.setre14.library.security.AuthenticatedUser;
-import at.setre14.library.views.authors.AuthorsView;
-import at.setre14.library.views.bookedit.BookEditView;
-import at.setre14.library.views.books.BooksView;
+import at.setre14.library.views.authors.AuthorListView;
+import at.setre14.library.views.book.BookEditView;
+import at.setre14.library.views.book.BookListView;
 import at.setre14.library.views.createuser.CreateUserView;
-import at.setre14.library.views.series.SeriesView;
+import at.setre14.library.views.series.SeriesListView;
 import at.setre14.library.views.settings.SettingsView;
-import at.setre14.library.views.tags.TagsView;
+import at.setre14.library.views.tags.TagListView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Footer;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.Scroller;
@@ -28,6 +23,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
@@ -38,8 +34,8 @@ public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
 
-    private AuthenticatedUser authenticatedUser;
-    private AccessAnnotationChecker accessChecker;
+    private final AuthenticatedUser authenticatedUser;
+    private final AccessAnnotationChecker accessChecker;
 
     public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
         this.authenticatedUser = authenticatedUser;
@@ -75,20 +71,20 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
 
-        if (accessChecker.hasAccess(BooksView.class)) {
-            nav.addItem(new AppNavItem("Books", BooksView.class, "la la-book"));
+        if (accessChecker.hasAccess(BookListView.class)) {
+            nav.addItem(new AppNavItem("Books", BookListView.class, "la la-book"));
 
         }
-        if (accessChecker.hasAccess(AuthorsView.class)) {
-            nav.addItem(new AppNavItem("Authors", AuthorsView.class, "la la-address-book"));
+        if (accessChecker.hasAccess(AuthorListView.class)) {
+            nav.addItem(new AppNavItem("Authors", AuthorListView.class, "la la-address-book"));
 
         }
-        if (accessChecker.hasAccess(TagsView.class)) {
-            nav.addItem(new AppNavItem("Tags", TagsView.class, "la la-tags"));
+        if (accessChecker.hasAccess(TagListView.class)) {
+            nav.addItem(new AppNavItem("Tags", TagListView.class, "la la-tags"));
 
         }
-        if (accessChecker.hasAccess(SeriesView.class)) {
-            nav.addItem(new AppNavItem("Series", SeriesView.class, "la la-list"));
+        if (accessChecker.hasAccess(SeriesListView.class)) {
+            nav.addItem(new AppNavItem("Series", SeriesListView.class, "la la-list"));
 
         }
         if (accessChecker.hasAccess(BookEditView.class)) {

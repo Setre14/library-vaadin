@@ -1,17 +1,19 @@
 package at.setre14.library.calibre;
 
+import at.setre14.library.data.author.Author;
 import at.setre14.library.data.author.AuthorService;
+import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.dbitem.DbItem;
-import at.setre14.library.data.author.Author;
-import at.setre14.library.data.book.Book;
 import at.setre14.library.data.series.Series;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.data.userbooksettings.UserBookSetting;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
-import at.setre14.library.model.*;
+import at.setre14.library.model.Language;
+import at.setre14.library.model.ReadingStatus;
+import at.setre14.library.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -165,6 +167,8 @@ public class CalibreService {
 
                     Map<String, UserBookSetting> userBookSettingMap = new HashMap<>();
 
+                    Book book = new Book(title, author, description, language, tags, series, seriesIndex);
+
                     for(int i = 0; i < metaNodes.getLength(); i++) {
                         Node metaNode = metaNodes.item(i);
                         NamedNodeMap attributes = metaNode.getAttributes();
@@ -186,19 +190,19 @@ public class CalibreService {
                                 }
                                 case SERIES_INDEX -> seriesIndex = Integer.parseInt(content);
                                 case READ_SIMON -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId());
+                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
                                     userBookSetting.setStatus(ReadingStatus.get(getCustomValue(content, "false").equals("true")));
                                 }
                                 case RATING_SIMON -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId());
+                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
                                     userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0"))/2f);
                                 }
                                 case READ_TAMARA -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, tamara.getId());
+                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
                                     userBookSetting.setStatus(ReadingStatus.get(getCustomValue(content, "false").equals("true")));
                                 }
                                 case RATING_TAMARA -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, tamara.getId());
+                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
                                     userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0"))/2f);
                                 }
                             }
@@ -207,7 +211,6 @@ public class CalibreService {
 
                     Path file = null;
                     List<File> epubs = listFiles(bookDir).stream().filter(f -> f.getName().endsWith(".epub")).toList();
-                    Book book = new Book(title, author, description, language, tags, series, seriesIndex);
                     book.setUserBookSettings(userBookSettingMap.values().stream().toList());
                     book.setUserBookSettingIds(userBookSettingMap.values().stream().map(UserBookSetting::getId).toList());
 
@@ -270,12 +273,12 @@ public class CalibreService {
         return attributes.getNamedItem(attribute.attribute).getTextContent();
     }
 
-    private static UserBookSetting getUserBookSetting(Map<String, UserBookSetting> userBookSettingMap, String userId) {
+    private static UserBookSetting getUserBookSetting(Map<String, UserBookSetting> userBookSettingMap, String userId, String bookId) {
         UserBookSetting userBookSetting = userBookSettingMap.get(userId);
 
         if(userBookSetting == null) {
-            userBookSetting = new UserBookSetting(userId, null);
-            userBookSettingMap.put(userId.toString(), userBookSetting);
+            userBookSetting = new UserBookSetting(userId, bookId);
+            userBookSettingMap.put(userId, userBookSetting);
         }
 
         return userBookSetting;
