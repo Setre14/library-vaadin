@@ -1,0 +1,27 @@
+spring:
+  profiles:
+    active: dev
+#  mvc:
+#    servlet:
+#      path: /api
+  servlet:
+    ## MULTIPART (MultipartProperties)
+    # Enable multipart uploads
+    multipart:
+      enabled: true
+      # Threshold after which files are written to disk.
+      file-size-threshold: 2KB
+      # Max file size.
+      max-file-size: 2000MB
+      # Max Request Size
+      max-request-size: 2000MB
+#
+#springdoc:
+#  api-docs:
+#    path: /docs
+#  swagger-ui:
+#    path: /swagger-ui
+
+
+vaadin:
+  launch-browser: false

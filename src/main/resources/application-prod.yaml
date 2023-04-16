@@ -1,0 +1,19 @@
+server:
+  port: ${PORT}
+
+spring:
+  data: 
+    mongodb:
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      authentication-database: admin
+      username: ${USERNAME}
+      password: ${PASSWORD}
+      database: ${DATABASE}
+
+## File Storage Properties
+# All files uploaded through the REST API will be stored in this directory
+file:
+  upload-dir: ${UPLOAD_DIR}
+  extract-dir: ${EXTRACT_DIR}
+  book-dir: ${BOOK_DIR}

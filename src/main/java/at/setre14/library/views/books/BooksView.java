@@ -1,5 +1,7 @@
 package at.setre14.library.views.books;
 
+import at.setre14.library.data.book.Book;
+import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.entity.SamplePerson;
 import at.setre14.library.data.service.SamplePersonService;
 import at.setre14.library.views.MainLayout;
@@ -35,6 +37,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 @PageTitle("Books")
@@ -44,13 +47,13 @@ import org.springframework.data.jpa.domain.Specification;
 @Uses(Icon.class)
 public class BooksView extends Div {
 
-    private Grid<SamplePerson> grid;
+    private Grid<Book> grid;
 
     private Filters filters;
-    private final SamplePersonService samplePersonService;
+    private final BookService bookService;
 
-    public BooksView(SamplePersonService SamplePersonService) {
-        this.samplePersonService = SamplePersonService;
+    public BooksView(BookService bookService) {
+        this.bookService = bookService;
         setSizeFull();
         addClassNames("books-view");
 
@@ -88,7 +91,7 @@ public class BooksView extends Div {
 
     public static class Filters extends Div implements Specification<SamplePerson> {
 
-        private final TextField name = new TextField("Name");
+        private final TextField name = new TextField("Title");
         private final TextField phone = new TextField("Phone");
         private final DatePicker startDate = new DatePicker("Date of Birth");
         private final DatePicker endDate = new DatePicker();
@@ -227,18 +230,19 @@ public class BooksView extends Div {
     }
 
     private Component createGrid() {
-        grid = new Grid<>(SamplePerson.class, false);
-        grid.addColumn("firstName").setAutoWidth(true);
-        grid.addColumn("lastName").setAutoWidth(true);
-        grid.addColumn("email").setAutoWidth(true);
-        grid.addColumn("phone").setAutoWidth(true);
-        grid.addColumn("dateOfBirth").setAutoWidth(true);
-        grid.addColumn("occupation").setAutoWidth(true);
-        grid.addColumn("role").setAutoWidth(true);
+        grid = new Grid<>(Book.class, false);
+        grid.addColumn("name").setHeader("Title").setAutoWidth(true);
+//        grid.addColumn("lastName").setAutoWidth(true);
+//        grid.addColumn("email").setAutoWidth(true);
+//        grid.addColumn("phone").setAutoWidth(true);
+//        grid.addColumn("dateOfBirth").setAutoWidth(true);
+//        grid.addColumn("occupation").setAutoWidth(true);
+//        grid.addColumn("role").setAutoWidth(true);
 
-        grid.setItems(query -> samplePersonService.list(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
-                filters).stream());
+//        grid.setItems(query -> bookService.list(
+//                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)),
+//                filters).stream());
+        grid.setItems(bookService.findAll());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addClassNames(LumoUtility.Border.TOP, LumoUtility.BorderColor.CONTRAST_10);
 

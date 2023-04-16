@@ -2,6 +2,8 @@ package at.setre14.library.views.authors;
 
 import at.setre14.library.data.entity.SamplePerson;
 import at.setre14.library.data.service.SamplePersonService;
+import at.setre14.library.data.author.Author;
+import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -33,6 +35,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -46,11 +49,19 @@ public class AuthorsView extends Div {
 
     private Filters filters;
     private final SamplePersonService samplePersonService;
+    private final AuthorService authorService;
 
-    public AuthorsView(SamplePersonService SamplePersonService) {
+
+    public AuthorsView(SamplePersonService SamplePersonService, AuthorService authorService) {
         this.samplePersonService = SamplePersonService;
+        this.authorService = authorService;
         setSizeFull();
         addClassNames("authors-view");
+
+        Author author = new Author("Name" + Math.random());
+        authorService.save(author);
+
+        System.out.println(authorService.count());
 
         filters = new Filters(() -> refreshGrid());
         VerticalLayout layout = new VerticalLayout(createMobileFilters(), filters, createGrid());
