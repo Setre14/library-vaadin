@@ -1,7 +1,9 @@
 package at.setre14.library.data.book;
 
+import at.setre14.library.data.author.Author;
 import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.dbitem.DbItemService;
+import at.setre14.library.data.series.Series;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
@@ -14,8 +16,6 @@ import java.util.List;
 
 @Service
 public class BookService extends DbItemService<Book> {
-
-
     private final AuthorService authorService;
     private final SeriesService seriesService;
     private final TagService tagService;
@@ -56,12 +56,19 @@ public class BookService extends DbItemService<Book> {
         return book;
     }
 
-    @Override
-    public Page<Book> list(Pageable pageable) {
-        Page<Book> page = super.list(pageable);
+    public Page<Book> list(String filterText, Pageable pageable) {
 
-        List books = page.get().map(this::initBook).toList();
-        System.out.println(books.size());
+        Page<Book> page;
+        if(filterText.equals("")) {
+            page = repository.findAll(pageable);
+        } else {
+            List<String> authorIds = authorService.filterByName(filterText).stream().map(Author::getId).toList();
+            List<String> seriesIds = seriesService.filterByName(filterText).stream().map(Series::getId).toList();
+
+            page = ((BookRepository) repository).findByNameContainsIgnoreCaseOrAuthorIdInOrSeriesIdIn(filterText, authorIds, seriesIds, pageable);
+        }
+
+        List<Book> books = page.get().map(this::initBook).toList();
 
         return page;
     }

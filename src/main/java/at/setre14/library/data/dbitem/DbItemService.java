@@ -12,7 +12,7 @@ import java.util.Optional;
 @Service
 public abstract class DbItemService<T extends DbItem> {
 
-    private final MongoRepository<T, String> repository;
+    protected final MongoRepository<T, String> repository;
 
     public DbItemService(MongoRepository<T, String> repository) {
         this.repository = repository;
@@ -28,6 +28,11 @@ public abstract class DbItemService<T extends DbItem> {
         Optional<T> item = repository.findById(id);
 
         return item.orElse(null);
+    }
+
+
+    public List<T> filterByName(String name) {
+        return ((DbItemRepository<T>) repository).findAllByNameContainsIgnoreCase(name);
     }
 
     public List<T> findAllById(List<String> ids) {
