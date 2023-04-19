@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService extends DbItemService<Book> {
@@ -35,6 +36,13 @@ public class BookService extends DbItemService<Book> {
         this.seriesService = seriesService;
         this.tagService = tagService;
         this.userBookSettingService = userBookSettingService;
+    }
+
+    @Override
+    public Book findById(String id) {
+        Optional<Book> item = repository.findById(id);
+
+        return item.map(this::initBook).orElse(null);
     }
 
     @Override

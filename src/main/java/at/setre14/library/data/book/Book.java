@@ -27,7 +27,7 @@ public class Book extends DbItem {
     private Author author;
     private List<String> tagIds;
     @Transient
-    private Set<Tag> tags;
+    private Set<Tag> tags = new HashSet<>();
     private String seriesId;
     @Transient
     private Series series;

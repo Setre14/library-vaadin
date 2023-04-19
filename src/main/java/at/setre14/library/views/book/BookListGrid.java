@@ -1,5 +1,6 @@
 package at.setre14.library.views.book;
 
+import at.setre14.library.components.dbitemlink.DbItemLink;
 import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
@@ -60,20 +61,15 @@ public class BookListGrid  extends Div {
             String id = item == null ? "" : item.getId();
             String text = item == null ? "" : item.getName();
 
-            RouterLink link = new RouterLink(text, viewClass, id);
-
-            link.addClassName("grid-cell-link");
-
-            return link;
+            return new DbItemLink(text, viewClass, id);
         });
     }
     private ComponentRenderer<HorizontalLayout, Book> createTagsComponentRenderer() {
         return new ComponentRenderer<>(book -> {
             HorizontalLayout horizontalLayout = new HorizontalLayout();
             for(Tag tag: book.getSortedTags()) {
-                RouterLink link = new RouterLink(tag.toString(), TagView.class, tag.getId());
+                DbItemLink link = new DbItemLink(tag.toString(), TagView.class, tag.getId());
                 link.getElement().getThemeList().add("badge contrast");
-                link.addClassName("grid-cell-link");
 
                 horizontalLayout.add(link);
             }
