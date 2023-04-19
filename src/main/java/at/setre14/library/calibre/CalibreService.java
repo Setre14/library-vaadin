@@ -166,7 +166,7 @@ public class CalibreService {
                     NodeList metaNodes = getElements(doc, CalibreTag.META);
 
                     Map<String, UserBookSetting> userBookSettingMap = new HashMap<>();
-
+                    
                     Book book = new Book(title, author, description, language, tags, series, seriesIndex);
 
                     for(int i = 0; i < metaNodes.getLength(); i++) {
@@ -187,8 +187,9 @@ public class CalibreService {
                                         seriesMap.put(content, series);
                                         calibreImport.getSeries().add(series);
                                     }
+                                    book.setSeriesId(series.getId());
                                 }
-                                case SERIES_INDEX -> seriesIndex = Integer.parseInt(content);
+                                case SERIES_INDEX -> book.setSeriesIndex(Integer.parseInt(content));
                                 case READ_SIMON -> {
                                     UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
                                     userBookSetting.setStatus(ReadingStatus.get(getCustomValue(content, "false").equals("true")));
