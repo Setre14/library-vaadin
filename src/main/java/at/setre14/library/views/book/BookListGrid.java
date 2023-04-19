@@ -1,9 +1,12 @@
 package at.setre14.library.views.book;
 
+import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.dbitem.DbItem;
+import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
+import at.setre14.library.data.tag.TagService;
 import at.setre14.library.views.authors.AuthorView;
 import at.setre14.library.views.series.SeriesView;
 import at.setre14.library.views.tags.TagView;
@@ -27,12 +30,12 @@ public class BookListGrid  extends Div {
     private final BookListFilter bookListFilter;
     private final Paginator paginator;
 
-    public BookListGrid(BookService bookService) {
+    public BookListGrid(AuthorService authorService, BookService bookService, SeriesService seriesService, TagService tagService) {
         this.bookService = bookService;
 
         setSizeFull();
 
-        bookListFilter = new BookListFilter(this::setGridItems);
+        bookListFilter = new BookListFilter(authorService.findAll(), seriesService.findAll(), tagService.findAll(), this::setGridItems);
         paginator = new Paginator(this::setGridItems);
 
         grid = new Grid<>(Book.class, false);
@@ -80,7 +83,7 @@ public class BookListGrid  extends Div {
 
     private void setGridItems() {
         Sort.Order order = new Sort.Order(Sort.Direction.ASC, "name");
-        Page<Book> page = bookService.list(bookListFilter.getFilterText(), paginator.getPageRequest(order));
+        Page<Book> page = bookService.list(bookListFilter.getBookFilter(), paginator.getPageRequest(order));
         paginator.update(page);
 
         grid.setItems(page.getContent());

@@ -2,7 +2,7 @@ package at.setre14.library.data.dbitem;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,13 +12,14 @@ import java.util.Optional;
 @Service
 public abstract class DbItemService<T extends DbItem> {
 
-    protected final MongoRepository<T, String> repository;
+    protected final DbItemRepository<T> repository;
 
-    public DbItemService(MongoRepository<T, String> repository) {
+    public DbItemService(DbItemRepository<T> repository) {
         this.repository = repository;
     }
     public List<T> findAll() {
-        return repository.findAll();
+        Sort.Order order = new Sort.Order(Sort.Direction.ASC, "name");
+        return repository.findAll(Sort.by(order));
     }
     public Page<T> list(Pageable pageable) {
         return repository.findAll(pageable);
@@ -32,7 +33,7 @@ public abstract class DbItemService<T extends DbItem> {
 
 
     public List<T> filterByName(String name) {
-        return ((DbItemRepository<T>) repository).findAllByNameContainsIgnoreCase(name);
+        return ((DbItemRepository<T>) repository).findByNameContainsIgnoreCase(name);
     }
 
     public List<T> findAllById(List<String> ids) {

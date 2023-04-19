@@ -2,7 +2,8 @@ package at.setre14.library.data.series;
 
 
 import at.setre14.library.data.dbitem.DbItemRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface SeriesRepository extends MongoRepository<Series, String>, DbItemRepository<Series> {
+@Repository
+public interface SeriesRepository extends DbItemRepository<Series> {
 }

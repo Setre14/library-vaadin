@@ -2,7 +2,8 @@ package at.setre14.library.data.author;
 
 
 import at.setre14.library.data.dbitem.DbItemRepository;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AuthorRepository extends MongoRepository<Author, String>, DbItemRepository<Author> {
+@Repository
+public interface AuthorRepository extends DbItemRepository<Author> {
 }

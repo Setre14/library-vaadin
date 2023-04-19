@@ -5,8 +5,10 @@ import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.dbitem.DbItemService;
 import at.setre14.library.data.series.Series;
 import at.setre14.library.data.series.SeriesService;
+import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
+import at.setre14.library.views.book.BookFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,16 +58,38 @@ public class BookService extends DbItemService<Book> {
         return book;
     }
 
-    public Page<Book> list(String filterText, Pageable pageable) {
+    public Page<Book> list(BookFilter filter, Pageable pageable) {
 
         Page<Book> page;
-        if(filterText.equals("")) {
-            page = repository.findAll(pageable);
-        } else {
-            List<String> authorIds = authorService.filterByName(filterText).stream().map(Author::getId).toList();
-            List<String> seriesIds = seriesService.filterByName(filterText).stream().map(Series::getId).toList();
+        BookRepository bookRepository = (BookRepository) repository;
 
-            page = ((BookRepository) repository).findByNameContainsIgnoreCaseOrAuthorIdInOrSeriesIdIn(filterText, authorIds, seriesIds, pageable);
+        String title = filter.getTitle();
+        Author author = filter.getAuthor();
+        Series series = filter.getSeries();
+        Tag tag = filter.getTag();
+
+        if(author != null) {
+            if (series != null) {
+                if (tag != null) {
+                    page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesIdAndTagIdsContains(title, author.getId(), series.getId(), tag.getId(), pageable);
+                } else {
+                    page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesId(title, author.getId(), series.getId(), pageable);
+                }
+            } else if (tag != null) {
+                page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndTagIdsContains(title, author.getId(), tag.getId(), pageable);
+            } else {
+                page = bookRepository.findByNameContainsIgnoreCaseAndAuthorId(title, author.getId(), pageable);
+            }
+        } else if(series != null) {
+            if (tag != null) {
+                page = bookRepository.findByNameContainsIgnoreCaseAndSeriesIdAndTagIdsContains(title, series.getId(), tag.getId(), pageable);
+            } else {
+                page = bookRepository.findByNameContainsIgnoreCaseAndSeriesId(title, series.getId(), pageable);
+            }
+        } else if(tag != null) {
+            page = bookRepository.findByNameContainsIgnoreCaseAndTagIdsContains(title, tag.getId(), pageable);
+        } else {
+            page = bookRepository.findByNameContainsIgnoreCase(title, pageable);
         }
 
         List<Book> books = page.get().map(this::initBook).toList();

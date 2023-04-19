@@ -1,6 +1,9 @@
 package at.setre14.library.views.book;
 
+import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.BookService;
+import at.setre14.library.data.series.SeriesService;
+import at.setre14.library.data.tag.TagService;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.html.Div;
@@ -19,10 +22,10 @@ import javax.annotation.security.RolesAllowed;
 @Uses(Icon.class)
 public class BookListView extends Div {
 
-    public BookListView(BookService bookService) {
+    public BookListView(AuthorService authorService, BookService bookService, SeriesService seriesService, TagService tagService) {
         setSizeFull();
 
-        BookListGrid grid = new BookListGrid(bookService);
+        BookListGrid grid = new BookListGrid(authorService, bookService, seriesService, tagService);
         VerticalLayout layout = new VerticalLayout(grid);
         layout.setSizeFull();
         layout.setPadding(false);
