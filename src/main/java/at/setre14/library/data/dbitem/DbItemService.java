@@ -1,5 +1,6 @@
 package at.setre14.library.data.dbitem;
 
+import at.setre14.library.components.grid.DbItemGridFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,10 @@ public abstract class DbItemService<T extends DbItem> {
         return repository.findAll(pageable);
     }
 
+    public Page<T> list(DbItemGridFilter<T> filter, Pageable pageable) {
+        return repository.findByNameContainsIgnoreCase(filter.getNameFilter(), pageable);
+    }
+
     public T findById(String id) {
         Optional<T> item = repository.findById(id);
 
@@ -33,7 +38,7 @@ public abstract class DbItemService<T extends DbItem> {
 
 
     public List<T> filterByName(String name) {
-        return ((DbItemRepository<T>) repository).findByNameContainsIgnoreCase(name);
+        return repository.findByNameContainsIgnoreCase(name);
     }
 
     public List<T> findAllById(List<String> ids) {

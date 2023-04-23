@@ -1,4 +1,4 @@
-package at.setre14.library.views;
+package at.setre14.library.views.dbitem;
 
 import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.dbitem.DbItemService;
@@ -40,18 +40,22 @@ public abstract class DbItemView<T extends DbItem> extends Div implements HasUrl
         VerticalLayout layout = new VerticalLayout();
 
         if(item != null) {
-
-            Span span = new Span(item.getName());
-
-            layout.add(span);
+            createFoundPage(layout);
         } else {
-
-            Span span = new Span("id not found");
-
-            layout.add(span);
+            createNotFoundPage(layout);
         }
 
         add(layout);
+    }
+
+    protected void createFoundPage(VerticalLayout layout) {
+        Span span = new Span(item.getName());
+        layout.add(span);
+    }
+
+    protected void createNotFoundPage(VerticalLayout layout) {
+        Span span = new Span(String.format("id \"%s\" not found", id));
+        layout.add(span);
     }
 
 

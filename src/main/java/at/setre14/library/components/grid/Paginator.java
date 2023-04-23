@@ -1,4 +1,4 @@
-package at.setre14.library.views.book;
+package at.setre14.library.components.grid;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 
 public class Paginator extends Div {
     private int pageNumber = 1;
-    private final int pageSize = 20;
     private int pagesTotal = 1;
     private final IntegerField pageNumberIntegerField = new IntegerField();
 
@@ -66,7 +65,8 @@ public class Paginator extends Div {
         add(horizontalLayout);
     }
 
-    PageRequest getPageRequest(Sort.Order order) {
+    public PageRequest getPageRequest(Sort.Order order) {
+        int pageSize = 20;
         return PageRequest.of(pageNumber-1, pageSize, Sort.by(order));
     }
 

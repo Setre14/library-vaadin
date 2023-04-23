@@ -8,7 +8,8 @@ import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
-import at.setre14.library.views.book.BookFilter;
+import at.setre14.library.components.grid.BookGridFilter;
+import at.setre14.library.components.grid.DbItemGridFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -66,43 +67,50 @@ public class BookService extends DbItemService<Book> {
         return book;
     }
 
-    public Page<Book> list(BookFilter filter, Pageable pageable) {
+    @Override
+    public Page<Book> list(DbItemGridFilter<Book> filter, Pageable pageable) {
+        if(filter instanceof BookGridFilter bookGridFilter) {
+            Page<Book> page;
+            BookRepository bookRepository = (BookRepository) repository;
 
-        Page<Book> page;
-        BookRepository bookRepository = (BookRepository) repository;
+            String title = filter.getNameFilter();
 
-        String title = filter.getTitle();
-        Author author = filter.getAuthor();
-        Series series = filter.getSeries();
-        Tag tag = filter.getTag();
+            Author author = bookGridFilter.getAuthorFilter();
+            Series series = bookGridFilter.getSeriesFilter();
+            Tag tag = bookGridFilter.getTagFilter();
 
-        if(author != null) {
-            if (series != null) {
-                if (tag != null) {
-                    page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesIdAndTagIdsContains(title, author.getId(), series.getId(), tag.getId(), pageable);
+            if(author != null) {
+                if (series != null) {
+                    if (tag != null) {
+                        page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesIdAndTagIdsContains(title, author.getId(), series.getId(), tag.getId(), pageable);
+                    } else {
+                        page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesId(title, author.getId(), series.getId(), pageable);
+                    }
+                } else if (tag != null) {
+                    page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndTagIdsContains(title, author.getId(), tag.getId(), pageable);
                 } else {
-                    page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesId(title, author.getId(), series.getId(), pageable);
+                    page = bookRepository.findByNameContainsIgnoreCaseAndAuthorId(title, author.getId(), pageable);
                 }
-            } else if (tag != null) {
-                page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndTagIdsContains(title, author.getId(), tag.getId(), pageable);
+            } else if(series != null) {
+                if (tag != null) {
+                    page = bookRepository.findByNameContainsIgnoreCaseAndSeriesIdAndTagIdsContains(title, series.getId(), tag.getId(), pageable);
+                } else {
+                    page = bookRepository.findByNameContainsIgnoreCaseAndSeriesId(title, series.getId(), pageable);
+                }
+            } else if(tag != null) {
+                page = bookRepository.findByNameContainsIgnoreCaseAndTagIdsContains(title, tag.getId(), pageable);
             } else {
-                page = bookRepository.findByNameContainsIgnoreCaseAndAuthorId(title, author.getId(), pageable);
+                page = bookRepository.findByNameContainsIgnoreCase(title, pageable);
             }
-        } else if(series != null) {
-            if (tag != null) {
-                page = bookRepository.findByNameContainsIgnoreCaseAndSeriesIdAndTagIdsContains(title, series.getId(), tag.getId(), pageable);
-            } else {
-                page = bookRepository.findByNameContainsIgnoreCaseAndSeriesId(title, series.getId(), pageable);
-            }
-        } else if(tag != null) {
-            page = bookRepository.findByNameContainsIgnoreCaseAndTagIdsContains(title, tag.getId(), pageable);
+
+            List<Book> books = page.get().map(this::initBook).toList();
+            System.out.println(books.size());
+
+            return page;
         } else {
-            page = bookRepository.findByNameContainsIgnoreCase(title, pageable);
+            return super.list(filter, pageable);
         }
 
-        List<Book> books = page.get().map(this::initBook).toList();
-
-        return page;
     }
 
 }
