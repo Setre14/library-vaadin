@@ -1,8 +1,10 @@
 package at.setre14.library.components.grid;
 
+import at.setre14.library.data.author.Author;
 import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
+import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
@@ -16,11 +18,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 public class BookGrid extends DbItemGrid<Book> {
     private final AuthorService authorService;
     private final SeriesService seriesService;
     private final TagService tagService;
+    private DbItem item;
 
     public BookGrid(BookService bookService, AuthorService authorService, SeriesService seriesService, TagService tagService) {
         super(bookService, Book.class, BookView.class);
@@ -29,9 +34,17 @@ public class BookGrid extends DbItemGrid<Book> {
         this.tagService = tagService;
     }
 
+    public BookGrid(BookService bookService, AuthorService authorService, SeriesService seriesService, TagService tagService, DbItem item) {
+        super(bookService, Book.class, BookView.class);
+        this.authorService = authorService;
+        this.seriesService = seriesService;
+        this.tagService = tagService;
+        this.item = item;
+    }
+
     @Override
     protected DbItemGridFilter<Book> createFilter() {
-        return new BookGridFilter(authorService.findAll(), seriesService.findAll(), tagService.findAll(), this::setGridItems).init();
+        return new BookGridFilter(authorService, seriesService, tagService, item, this::setGridItems).init();
     }
 
     @Override

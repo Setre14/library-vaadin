@@ -1,9 +1,12 @@
 package at.setre14.library.views.book;
 
+import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.dbitem.DbItem;
+import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
+import at.setre14.library.data.tag.TagService;
 import at.setre14.library.views.MainLayout;
 import at.setre14.library.views.authors.AuthorView;
 import at.setre14.library.views.dbitem.DbItemView;
@@ -27,8 +30,8 @@ import javax.annotation.security.RolesAllowed;
 @Uses(Icon.class)
 public class BookView extends DbItemView<Book> {
 
-    public BookView(BookService service) {
-        super(service);
+    public BookView(BookService service, AuthorService authorService, SeriesService seriesService, TagService tagService) {
+        super(service, service, authorService, seriesService, tagService);
     }
 
     @Override
