@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: dev # env var: SPRING_PROFILES_ACTIVE 
 #  mvc:
 #    servlet:
 #      path: /api

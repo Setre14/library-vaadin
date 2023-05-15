@@ -58,7 +58,7 @@ public class BookGridFilter extends DbItemGridFilter<Book> {
             }
         });
 
-        String itemClassName = item.getClass().getSimpleName();
+        String itemClassName = item != null ? item.getClass().getSimpleName() : "no-item";
 
         List<Component> filterComboBoxes = new ArrayList<>();
 
@@ -109,14 +109,13 @@ public class BookGridFilter extends DbItemGridFilter<Book> {
     }
 
     public Author getAuthorFilter() {
-        return item.getClass().getSimpleName().equals("Author") ? (Author) item : authorComboBox.getValue();
+        return item != null && item.getClass().getSimpleName().equals("Author") ? (Author) item : authorComboBox.getValue();
     }
     public Series getSeriesFilter() {
-        return item.getClass().getSimpleName().equals("Series") ? (Series) item : seriesComboBox.getValue();
+        return item != null && item.getClass().getSimpleName().equals("Series") ? (Series) item : seriesComboBox.getValue();
     }
     public Tag getTagFilter() {
-        return item.getClass().getSimpleName().equals("Tag") ? (Tag) item : tagComboBox.getValue();
+        return item != null && item.getClass().getSimpleName().equals("Tag") ? (Tag) item : tagComboBox.getValue();
     }
-
 }
 

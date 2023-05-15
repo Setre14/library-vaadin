@@ -10,6 +10,7 @@ import java.util.List;
 
 @NoRepositoryBean
 public interface DbItemRepository<T extends DbItem> extends MongoRepository<T, String> {
+    T findByName(String name);
     List<T> findByNameContainsIgnoreCase(String name);
     Page<T> findByNameContainsIgnoreCase(String name, Pageable pageable);
 }

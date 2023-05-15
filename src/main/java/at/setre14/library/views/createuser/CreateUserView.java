@@ -1,7 +1,5 @@
 package at.setre14.library.views.createuser;
 
-import at.setre14.library.data.entity.SamplePerson;
-import at.setre14.library.data.service.SamplePersonService;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -14,11 +12,9 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -39,28 +35,28 @@ public class CreateUserView extends Div {
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
 
-    private final Binder<SamplePerson> binder = new Binder<>(SamplePerson.class);
+//    private final Binder<SamplePerson> binder = new Binder<>(SamplePerson.class);
 
-    public CreateUserView(SamplePersonService personService) {
+    public CreateUserView() {
         addClassName("create-user-view");
 
         add(createTitle());
         add(createFormLayout());
         add(createButtonLayout());
 
-        binder.bindInstanceFields(this);
+//        binder.bindInstanceFields(this);
         clearForm();
 
         cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
-            personService.update(binder.getBean());
-            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
+//            personService.update(binder.getBean());
+//            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
             clearForm();
         });
     }
 
     private void clearForm() {
-        binder.setBean(new SamplePerson());
+//        binder.setBean(new SamplePerson());
     }
 
     private Component createTitle() {

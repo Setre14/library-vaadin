@@ -2,7 +2,7 @@ package at.setre14.library.views;
 
 import at.setre14.library.components.appnav.AppNav;
 import at.setre14.library.components.appnav.AppNavItem;
-import at.setre14.library.data.entity.User;
+import at.setre14.library.data.user.User;
 import at.setre14.library.security.AuthenticatedUser;
 import at.setre14.library.views.authors.AuthorListView;
 import at.setre14.library.views.book.BookEditView;
@@ -111,9 +111,9 @@ public class MainLayout extends AppLayout {
             User user = maybeUser.get();
 
             Avatar avatar = new Avatar(user.getName());
-            StreamResource resource = new StreamResource("profile-pic",
-                    () -> new ByteArrayInputStream(user.getProfilePicture()));
-            avatar.setImageResource(resource);
+//            StreamResource resource = new StreamResource("profile-pic",
+//                    () -> new ByteArrayInputStream(user.getProfilePicture()));
+//            avatar.setImageResource(resource);
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
 

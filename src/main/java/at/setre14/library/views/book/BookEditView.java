@@ -3,7 +3,6 @@ package at.setre14.library.views.book;
 import at.setre14.library.data.author.Author;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.series.Series;
-import at.setre14.library.data.service.SamplePersonService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.model.ReadingStatus;
 import at.setre14.library.views.MainLayout;
@@ -31,6 +30,7 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import javax.annotation.security.RolesAllowed;
 import java.io.InputStream;
@@ -40,7 +40,8 @@ import java.util.List;
 
 @PageTitle("Book Edit")
 @Route(value = "book-edit", layout = MainLayout.class)
-@RolesAllowed("USER")
+@AnonymousAllowed
+// @RolesAllowed("USER")
 @Uses(Icon.class)
 public class BookEditView extends Div {
 
@@ -83,7 +84,7 @@ public class BookEditView extends Div {
             )
     );
 
-    public BookEditView(SamplePersonService personService) {
+    public BookEditView() {
         addClassName("book-edit-view");
 
         add(createTitle());

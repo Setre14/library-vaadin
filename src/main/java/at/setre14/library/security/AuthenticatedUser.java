@@ -1,7 +1,7 @@
 package at.setre14.library.security;
 
-import at.setre14.library.data.entity.User;
-import at.setre14.library.data.service.UserRepository;
+import at.setre14.library.data.user.User;
+import at.setre14.library.data.user.UserRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -21,7 +21,7 @@ public class AuthenticatedUser {
 
     public Optional<User> get() {
         return authenticationContext.getAuthenticatedUser(UserDetails.class)
-                .map(userDetails -> userRepository.findByUsername(userDetails.getUsername()));
+                .map(userDetails -> userRepository.findByName(userDetails.getUsername()));
     }
 
     public void logout() {

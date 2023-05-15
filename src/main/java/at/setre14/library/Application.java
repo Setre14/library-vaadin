@@ -24,25 +24,9 @@ import java.util.Arrays;
 @NpmPackage(value = "line-awesome", version = "1.3.0")
 @NpmPackage(value = "@vaadin-component-factory/vcf-nav", version = "1.0.6")
 public class Application implements AppShellConfigurator {
-
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-
-//    @Bean
-//    SqlDataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer(DataSource dataSource,
-//            SqlInitializationProperties properties, SamplePersonRepository repository) {
-//        // This bean ensures the database is only initialized when empty
-//        return new SqlDataSourceScriptDatabaseInitializer(dataSource, properties) {
-//            @Override
-//            public boolean initializeDatabase() {
-//                if (repository.count() == 0L) {
-//                    return super.initializeDatabase();
-//                }
-//                return false;
-//            }
-//        };
-//    }
 }
 
 @Component

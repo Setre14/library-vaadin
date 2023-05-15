@@ -13,7 +13,7 @@ import at.setre14.library.data.userbooksettings.UserBookSetting;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
 import at.setre14.library.model.Language;
 import at.setre14.library.model.ReadingStatus;
-import at.setre14.library.model.User;
+import at.setre14.library.data.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

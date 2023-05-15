@@ -12,10 +12,10 @@ spring:
       password: password
       database: library-dev
 
-  jpa:
-    defer-datasource-initialization: true
-  sql:
-    init.mode: always
+  # jpa:
+  #   defer-datasource-initialization: true
+  # sql:
+  #   init.mode: always
 
 ## File Storage Properties
 # All files uploaded through the REST API will be stored in this directory
