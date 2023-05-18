@@ -6,9 +6,6 @@ spring:
     mongodb:
       host: ${MONGO_HOST}
       port: ${MONGO_PORT}
-      authentication-database: admin
-      username: ${USERNAME}
-      password: ${PASSWORD}
       database: ${DATABASE}
 
 ## File Storage Properties

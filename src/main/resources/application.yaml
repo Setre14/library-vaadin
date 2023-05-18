@@ -15,6 +15,12 @@ spring:
       max-file-size: 2000MB
       # Max Request Size
       max-request-size: 2000MB
+
+  data:
+    mongodb:
+      authentication-database: admin
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
 #
 #springdoc:
 #  api-docs:
