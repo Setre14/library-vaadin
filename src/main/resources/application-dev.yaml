@@ -8,8 +8,8 @@ spring:
 #      host: home-server:27017
       port: 27017
       authentication-database: admin
-      username: fCEomFgy249GFq
-      password: fCEomFgy249GFq
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
       database: library-dev
 
   # jpa:

@@ -23,8 +23,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import java.util.Optional;
-
 /**
  * The main view is a top-level placeholder for other views.
  */
@@ -103,10 +101,8 @@ public class MainLayout extends AppLayout {
     private Footer createFooter() {
         Footer layout = new Footer();
 
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
-
+        User user = authenticatedUser.get();
+        if (user != null) {
             Avatar avatar = new Avatar(user.getName());
 //            StreamResource resource = new StreamResource("profile-pic",
 //                    () -> new ByteArrayInputStream(user.getProfilePicture()));
@@ -120,7 +116,7 @@ public class MainLayout extends AppLayout {
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            div.add(user.getName());
+            div.add(user.getName() + " (" + user.getId() + ")");
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");

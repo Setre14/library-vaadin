@@ -4,7 +4,7 @@ import at.setre14.library.data.author.Author;
 import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.series.Series;
 import at.setre14.library.data.tag.Tag;
-import at.setre14.library.data.userbooksettings.UserBookSetting;
+import at.setre14.library.data.userbooksetting.UserBookSetting;
 import at.setre14.library.model.Language;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,9 +37,8 @@ public class Book extends DbItem {
 
     private String ebook;
     private boolean physical;
-    private List<String> userBookSettingIds;
     @Transient
-    private List<UserBookSetting> userBookSettings;
+    private UserBookSetting userBookSetting;
 
     public Book() {
         super();
@@ -49,7 +48,7 @@ public class Book extends DbItem {
         this.seriesIndex = 1;
         this.description = "description";
         this.language = Language.GERMAN;
-        this.userBookSettingIds = new ArrayList<>();
+        this.userBookSetting = null;
     }
 
     public Book(String name) {
@@ -60,7 +59,7 @@ public class Book extends DbItem {
         this.seriesIndex = 1;
         this.description = "description";
         this.language = Language.GERMAN;
-        this.userBookSettingIds = new ArrayList<>();
+        this.userBookSetting = null;
     }
 
     public Book(String name, DbItem authorId, String description, Language language, List<DbItem> tagIds, DbItem seriesId, int seriesIndex) {
@@ -83,5 +82,15 @@ public class Book extends DbItem {
             return tags.stream().sorted(Comparator.comparing(a -> a.getName().toLowerCase())).toList();
         }
         return new ArrayList<>();
+    }
+
+    public void updateIds() {
+        if (author != null) {
+            authorId = author.getId();
+        }
+        if (series != null) {
+            seriesId = series.getId();
+        }
+        tagIds = tags.stream().map(DbItem::getId).collect(Collectors.toList());
     }
 }

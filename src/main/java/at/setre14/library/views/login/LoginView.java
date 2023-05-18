@@ -38,7 +38,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 //                .containsKey("error")) {
 //            login.setError(true);
 //        }
-        if (authenticatedUser.get().isPresent()) {
+        if (authenticatedUser.get() != null) {
             // Already logged in
 //            setOpened(false);
             beforeEnterEvent.forwardTo("");

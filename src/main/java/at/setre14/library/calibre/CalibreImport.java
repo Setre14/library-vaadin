@@ -4,7 +4,7 @@ import at.setre14.library.data.author.Author;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.series.Series;
 import at.setre14.library.data.tag.Tag;
-import at.setre14.library.data.userbooksettings.UserBookSetting;
+import at.setre14.library.data.userbooksetting.UserBookSetting;
 import lombok.Getter;
 import lombok.Setter;
 

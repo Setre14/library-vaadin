@@ -19,9 +19,21 @@ public class AuthenticatedUser {
         this.authenticationContext = authenticationContext;
     }
 
-    public Optional<User> get() {
-        return authenticationContext.getAuthenticatedUser(UserDetails.class)
+    public User get() {
+        Optional<User> optionalUser = authenticationContext.getAuthenticatedUser(UserDetails.class)
                 .map(userDetails -> userRepository.findByName(userDetails.getUsername()));
+        return optionalUser.orElse(null);
+    }
+
+    public User waitAndGet() {
+        Optional<UserDetails> optionalUserDetails = Optional.empty();
+
+        while (optionalUserDetails.isEmpty()) {
+            optionalUserDetails = authenticationContext.getAuthenticatedUser(UserDetails.class);
+        }
+
+
+        return userRepository.findByName(optionalUserDetails.get().getUsername());
     }
 
     public void logout() {

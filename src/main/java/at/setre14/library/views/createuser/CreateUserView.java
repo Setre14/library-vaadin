@@ -101,8 +101,8 @@ public class CreateUserView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (authenticatedUser.get().isPresent()) {
-            User user = authenticatedUser.get().get();
+        User user = authenticatedUser.get();
+        if (user != null) {
             if (user.getRole() != Role.ADMIN) {
                 beforeEnterEvent.forwardTo("");
             }

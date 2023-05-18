@@ -2,6 +2,8 @@ package at.setre14.library.views.settings;
 
 import at.setre14.library.calibre.CalibreImport;
 import at.setre14.library.calibre.CalibreService;
+import at.setre14.library.data.book.BookService;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
@@ -30,14 +32,18 @@ import java.util.zip.ZipInputStream;
 public class SettingsView extends VerticalLayout {
 
     private final CalibreService calibreService;
+    private final BookService bookService;
 
     private final FileBuffer buffer = new FileBuffer();
     private final Upload upload = new Upload(buffer);
 
     public SettingsView(
-            CalibreService calibreService
+            CalibreService calibreService,
+            BookService bookService,
+            UserBookSettingService userBookSettingService
     ) {
         this.calibreService = calibreService;
+        this.bookService = bookService;
 
         upload.setAutoUpload(false);
         upload.setAcceptedFileTypes(".zip");
@@ -124,10 +130,18 @@ public class SettingsView extends VerticalLayout {
         content.setSpacing(false);
         content.setPadding(false);
 
+
         Details details = new Details("Import Calibre db", content);
         details.setOpened(true);
 
-        add(details);
+
+        Button delete = new Button("Delete all books");
+        delete.addClickListener(e -> {
+            bookService.deleteAll();
+            userBookSettingService.deleteAll();
+        });
+
+        add(details, delete);
     }
 
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {

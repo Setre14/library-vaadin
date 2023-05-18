@@ -63,4 +63,8 @@ public abstract class DbItemService<T extends DbItem> {
         return (int) repository.count();
     }
 
+    public void deleteAll() {
+        repository.deleteAll();
+    }
+
 }

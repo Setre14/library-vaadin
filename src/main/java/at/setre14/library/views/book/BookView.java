@@ -7,6 +7,8 @@ import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
+import at.setre14.library.data.userbooksetting.UserBookSetting;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
 import at.setre14.library.views.MainLayout;
 import at.setre14.library.views.authors.AuthorView;
 import at.setre14.library.views.dbitem.DbItemView;
@@ -30,8 +32,8 @@ import javax.annotation.security.RolesAllowed;
 @Uses(Icon.class)
 public class BookView extends DbItemView<Book> {
 
-    public BookView(BookService service, AuthorService authorService, SeriesService seriesService, TagService tagService) {
-        super(service, service, authorService, seriesService, tagService);
+    public BookView(BookService service, AuthorService authorService, SeriesService seriesService, TagService tagService, UserBookSettingService userBookSettingService) {
+        super(service, service, authorService, seriesService, tagService, userBookSettingService);
     }
 
     @Override
@@ -66,8 +68,23 @@ public class BookView extends DbItemView<Book> {
         DescriptionList.Description description = new DescriptionList.Description(tags);
         descriptionList.add(tagsTerm, description);
 
+        bookService.addUserBookSettings(item);
+        UserBookSetting userBookSetting = item.getUserBookSetting();
 
-        add(title, descriptionList);
+        createRow(descriptionList, "Physical", String.valueOf(item.isPhysical()));
+        createRow(descriptionList, "Status", String.valueOf(userBookSetting.getStatus()));
+        createRow(descriptionList, "Page", String.valueOf(userBookSetting.getPage()));
+        createRow(descriptionList, "Rating", String.valueOf(userBookSetting.getRating()));
+        System.out.println(userBookSetting.getId());
+        System.out.println(userBookSetting.isSync());
+        createRow(descriptionList, "Tolino Sync", String.valueOf(userBookSetting.isSync()));
+
+        RouterLink link = new RouterLink("Edit", BookEditView.class, id);
+
+
+        add(title, descriptionList, link);
+
+        System.out.println(item.getUserBookSetting());
     }
 
     protected void createRow(DescriptionList descriptionList, String label, String value) {

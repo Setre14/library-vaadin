@@ -10,8 +10,9 @@ import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.data.user.User;
-import at.setre14.library.data.userbooksettings.UserBookSetting;
-import at.setre14.library.data.userbooksettings.UserBookSettingService;
+import at.setre14.library.data.user.UserService;
+import at.setre14.library.data.userbooksetting.UserBookSetting;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
 import at.setre14.library.model.Language;
 import at.setre14.library.model.ReadingStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,12 +61,15 @@ public class CalibreService {
     private final SeriesService seriesService;
     private final TagService tagService;
     private final UserBookSettingService userBookSettingService;
-    public CalibreService(AuthorService authorService, BookService bookService, SeriesService seriesService, TagService tagService, UserBookSettingService userBookSettingService) {
+    private final UserService userService;
+
+    public CalibreService(AuthorService authorService, BookService bookService, SeriesService seriesService, TagService tagService, UserBookSettingService userBookSettingService, UserService userService) {
         this.authorService = authorService;
         this.bookService = bookService;
         this.seriesService = seriesService;
         this.tagService = tagService;
         this.userBookSettingService = userBookSettingService;
+        this.userService = userService;
     }
 
     private static <T extends DbItem> Map<String, T> createLookupMap(List<T> list, Function<T, String> func) {
@@ -160,8 +164,7 @@ public class CalibreService {
         List<Book> initBooks = bookService.findAll();
         List<Series> initSeries = seriesService.findAll();
         List<Tag> initTags = tagService.findAll();
-
-        List<User> users = new ArrayList<>();
+        List<User> users = userService.findAll();
 
         LocalDateTime time = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
@@ -179,7 +182,7 @@ public class CalibreService {
         Map<String, Tag> tagsMap = createLookupMap(initTags, Tag::getName);
         Map<String, User> userMap = createLookupMap(users, User::getName);
 
-        User simon = userMap.containsKey("simon") ? userMap.get("simon") : new User("simon", "simon");
+        User simon = userMap.containsKey("setre14") ? userMap.get("setre14") : new User("simon", "simon");
         User tamara = userMap.containsKey("tamara") ? userMap.get("tamara") : new User("tamara", "tamara");
 
         try {
@@ -279,7 +282,7 @@ public class CalibreService {
                                 }
                                 case RATING_SIMON -> {
                                     UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
-                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0")) / 2f);
+                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0")) / 2);
                                 }
                                 case READ_TAMARA -> {
                                     UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
@@ -287,7 +290,7 @@ public class CalibreService {
                                 }
                                 case RATING_TAMARA -> {
                                     UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
-                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0")) / 2f);
+                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0")) / 2);
                                 }
                             }
                         }
@@ -295,8 +298,8 @@ public class CalibreService {
 
                     Path file = null;
                     List<File> epubs = listFiles(bookDir).stream().filter(f -> f.getName().endsWith(".epub")).toList();
-                    book.setUserBookSettings(userBookSettingMap.values().stream().toList());
-                    book.setUserBookSettingIds(userBookSettingMap.values().stream().map(UserBookSetting::getId).toList());
+//                    book.setUserBookSettings(userBookSettingMap.values().stream().toList());
+//                    book.setUserBookSettingIds(userBookSettingMap.values().stream().map(UserBookSetting::getId).toList());
 
                     if (epubs.size() > 0) {
                         file = epubs.get(0).toPath();
@@ -307,7 +310,7 @@ public class CalibreService {
                         calibreImport.getBooks().add(book);
                         bookMap.put(book.createMapKey(), book);
 
-                        calibreImport.getUserBookSettings().addAll(book.getUserBookSettings());
+                        calibreImport.getUserBookSettings().addAll(userBookSettingMap.values().stream().toList());
                     }
                 }
 

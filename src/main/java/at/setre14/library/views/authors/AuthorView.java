@@ -5,6 +5,7 @@ import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.TagService;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
 import at.setre14.library.views.MainLayout;
 import at.setre14.library.views.dbitem.DbItemView;
 import com.vaadin.flow.component.dependency.Uses;
@@ -19,8 +20,8 @@ import javax.annotation.security.RolesAllowed;
 @RolesAllowed({"ADMIN", "USER"})
 @Uses(Icon.class)
 public class AuthorView extends DbItemView<Author> {
-    public AuthorView(AuthorService service, BookService bookService, SeriesService seriesService, TagService tagService) {
-        super(service, bookService, service, seriesService, tagService);
+    public AuthorView(AuthorService service, BookService bookService, SeriesService seriesService, TagService tagService, UserBookSettingService userBookSettingService) {
+        super(service, bookService, service, seriesService, tagService, userBookSettingService);
     }
 
     @Override

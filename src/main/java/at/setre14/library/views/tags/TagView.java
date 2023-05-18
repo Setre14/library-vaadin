@@ -5,6 +5,7 @@ import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
 import at.setre14.library.views.MainLayout;
 import at.setre14.library.views.dbitem.DbItemView;
 import com.vaadin.flow.component.dependency.Uses;
@@ -20,8 +21,8 @@ import javax.annotation.security.RolesAllowed;
 @Uses(Icon.class)
 public class TagView extends DbItemView<Tag> {
 
-    public TagView(TagService service, BookService bookService, AuthorService authorService, SeriesService seriesService) {
-        super(service, bookService, authorService, seriesService, service);
+    public TagView(TagService service, BookService bookService, AuthorService authorService, SeriesService seriesService, UserBookSettingService userBookSettingService) {
+        super(service, bookService, authorService, seriesService, service, userBookSettingService);
     }
 
     @Override

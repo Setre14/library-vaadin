@@ -9,7 +9,8 @@ import at.setre14.library.data.series.Series;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
-import at.setre14.library.data.userbooksettings.UserBookSettingService;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
+import at.setre14.library.security.AuthenticatedUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,14 @@ import java.util.Optional;
 
 @Service
 public class BookService extends DbItemService<Book> {
+    private final AuthenticatedUser authenticatedUser;
     private final AuthorService authorService;
     private final SeriesService seriesService;
     private final TagService tagService;
     private final UserBookSettingService userBookSettingService;
 
     public BookService(
+            AuthenticatedUser authenticatedUser,
             BookRepository repository,
             AuthorService authorService,
             SeriesService seriesService,
@@ -33,6 +36,7 @@ public class BookService extends DbItemService<Book> {
             UserBookSettingService userBookSettingService
     ) {
         super(repository);
+        this.authenticatedUser = authenticatedUser;
         this.authorService = authorService;
         this.seriesService = seriesService;
         this.tagService = tagService;
@@ -113,4 +117,7 @@ public class BookService extends DbItemService<Book> {
 
     }
 
+    public void addUserBookSettings(Book book) {
+        book.setUserBookSetting(userBookSettingService.find(authenticatedUser.waitAndGet().getId(), book.getId()));
+    }
 }

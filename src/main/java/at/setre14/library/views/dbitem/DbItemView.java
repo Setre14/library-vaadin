@@ -9,6 +9,7 @@ import at.setre14.library.data.dbitem.DbItem;
 import at.setre14.library.data.dbitem.DbItemService;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.TagService;
+import at.setre14.library.data.userbooksetting.UserBookSettingService;
 import com.vaadin.flow.component.html.DescriptionList;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -19,22 +20,24 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 
 public abstract class DbItemView<T extends DbItem> extends Div implements HasUrlParameter<String> {
-    private final DbItemService<T> service;
-    private final BookService bookService;
-    private final AuthorService authorService;
-    private final SeriesService seriesService;
-    private final TagService tagService;
+    protected final DbItemService<T> service;
+    protected final BookService bookService;
+    protected final AuthorService authorService;
+    protected final SeriesService seriesService;
+    protected final TagService tagService;
+    protected final UserBookSettingService userBookSettingService;
 
 
     protected String id;
     protected T item;
 
-    public DbItemView(DbItemService<T> service, BookService bookService, AuthorService authorService, SeriesService seriesService, TagService tagService) {
+    public DbItemView(DbItemService<T> service, BookService bookService, AuthorService authorService, SeriesService seriesService, TagService tagService, UserBookSettingService userBookSettingService) {
         this.service = service;
         this.bookService = bookService;
         this.authorService = authorService;
         this.seriesService = seriesService;
         this.tagService = tagService;
+        this.userBookSettingService = userBookSettingService;
     }
 
     @Override
