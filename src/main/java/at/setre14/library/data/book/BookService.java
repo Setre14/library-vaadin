@@ -1,5 +1,7 @@
 package at.setre14.library.data.book;
 
+import at.setre14.library.components.grid.BookGridFilter;
+import at.setre14.library.components.grid.DbItemGridFilter;
 import at.setre14.library.data.author.Author;
 import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.dbitem.DbItemService;
@@ -8,8 +10,6 @@ import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
-import at.setre14.library.components.grid.BookGridFilter;
-import at.setre14.library.components.grid.DbItemGridFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class BookService extends DbItemService<Book> {
     public List<Book> findAll() {
         List<Book> books = super.findAll();
 
-        for(Book book: books) {
+        for (Book book : books) {
             book.setAuthor(authorService.findById(book.getAuthorId()));
             book.setSeries(seriesService.findById(book.getSeriesId()));
             book.setTags(new HashSet<>(tagService.findAllById(book.getTagIds())));
@@ -69,7 +69,7 @@ public class BookService extends DbItemService<Book> {
 
     @Override
     public Page<Book> list(DbItemGridFilter<Book> filter, Pageable pageable) {
-        if(filter instanceof BookGridFilter bookGridFilter) {
+        if (filter instanceof BookGridFilter bookGridFilter) {
             Page<Book> page;
             BookRepository bookRepository = (BookRepository) repository;
 
@@ -79,7 +79,7 @@ public class BookService extends DbItemService<Book> {
             Series series = bookGridFilter.getSeriesFilter();
             Tag tag = bookGridFilter.getTagFilter();
 
-            if(author != null) {
+            if (author != null) {
                 if (series != null) {
                     if (tag != null) {
                         page = bookRepository.findByNameContainsIgnoreCaseAndAuthorIdAndSeriesIdAndTagIdsContains(title, author.getId(), series.getId(), tag.getId(), pageable);
@@ -91,13 +91,13 @@ public class BookService extends DbItemService<Book> {
                 } else {
                     page = bookRepository.findByNameContainsIgnoreCaseAndAuthorId(title, author.getId(), pageable);
                 }
-            } else if(series != null) {
+            } else if (series != null) {
                 if (tag != null) {
                     page = bookRepository.findByNameContainsIgnoreCaseAndSeriesIdAndTagIdsContains(title, series.getId(), tag.getId(), pageable);
                 } else {
                     page = bookRepository.findByNameContainsIgnoreCaseAndSeriesId(title, series.getId(), pageable);
                 }
-            } else if(tag != null) {
+            } else if (tag != null) {
                 page = bookRepository.findByNameContainsIgnoreCaseAndTagIdsContains(title, tag.getId(), pageable);
             } else {
                 page = bookRepository.findByNameContainsIgnoreCase(title, pageable);

@@ -1,13 +1,13 @@
 package at.setre14.library.views.book;
 
 import at.setre14.library.components.grid.BookGrid;
+import at.setre14.library.components.grid.DbItemGrid;
 import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.TagService;
 import at.setre14.library.views.MainLayout;
-import at.setre14.library.components.grid.DbItemGrid;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
@@ -15,15 +15,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import javax.annotation.security.RolesAllowed;
 
 @PageTitle("Books")
 @Route(value = "book-list", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
-@AnonymousAllowed
-// @RolesAllowed("USER")
+@RolesAllowed({"ADMIN", "USER"})
 @Uses(Icon.class)
 public class BookListView extends Div {
 

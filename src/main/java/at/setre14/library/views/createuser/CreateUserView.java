@@ -1,20 +1,26 @@
 package at.setre14.library.views.createuser;
 
+import at.setre14.library.data.Role;
+import at.setre14.library.data.user.User;
+import at.setre14.library.data.user.UserService;
+import at.setre14.library.security.AuthenticatedUser;
 import at.setre14.library.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.customfield.CustomField;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -23,21 +29,24 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @Route(value = "create-user", layout = MainLayout.class)
 @AnonymousAllowed
 @Uses(Icon.class)
-public class CreateUserView extends Div {
+public class CreateUserView extends Div implements BeforeEnterObserver {
 
-    private final TextField firstName = new TextField("First name");
-    private final TextField lastName = new TextField("Last name");
-    private final EmailField email = new EmailField("Email address");
-    private final DatePicker dateOfBirth = new DatePicker("Birthday");
-    private final PhoneNumberField phone = new PhoneNumberField("Phone number");
-    private final TextField occupation = new TextField("Occupation");
+    private final AuthenticatedUser authenticatedUser;
+    private final UserService userService;
+
+    private final TextField usernameTextField = new TextField("Username");
+    private final PasswordField passwordField = new PasswordField("Password");
+    private final ComboBox<Role> rolesComboBox = new ComboBox<>("Roles");
 
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
 
-//    private final Binder<SamplePerson> binder = new Binder<>(SamplePerson.class);
+    private final Binder<User> binder = new Binder<>(User.class);
 
-    public CreateUserView() {
+    public CreateUserView(AuthenticatedUser authenticatedUser, UserService userService) {
+        this.authenticatedUser = authenticatedUser;
+        this.userService = userService;
+
         addClassName("create-user-view");
 
         add(createTitle());
@@ -45,28 +54,39 @@ public class CreateUserView extends Div {
         add(createButtonLayout());
 
 //        binder.bindInstanceFields(this);
+        binder.bind(usernameTextField, User::getName, User::setName);
+        binder.bind(passwordField, User::getPassword, User::setPassword);
+        binder.bind(rolesComboBox, User::getRole, User::setRole);
+//        binder.bind(username, User::getName, Book::setName);
+
         clearForm();
 
         cancel.addClickListener(e -> clearForm());
         save.addClickListener(e -> {
+            System.out.println(binder.getBean());
 //            personService.update(binder.getBean());
-//            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
+            Notification.show(binder.getBean().getClass().getSimpleName() + " details stored.");
+            userService.save(binder.getBean());
             clearForm();
         });
     }
 
     private void clearForm() {
-//        binder.setBean(new SamplePerson());
+        binder.setBean(new User());
     }
 
     private Component createTitle() {
-        return new H3("Personal information");
+        return new H3("Create user");
     }
 
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
-        email.setErrorMessage("Please enter a valid email address");
-        formLayout.add(firstName, lastName, dateOfBirth, phone, email, occupation);
+
+        rolesComboBox.setItems(Role.values());
+        rolesComboBox.setItemLabelGenerator(Role::getName);
+
+//        email.setErrorMessage("Please enter a valid email address");
+        formLayout.add(usernameTextField, passwordField, rolesComboBox);
         return formLayout;
     }
 
@@ -79,46 +99,15 @@ public class CreateUserView extends Div {
         return buttonLayout;
     }
 
-    private static class PhoneNumberField extends CustomField<String> {
-        private final ComboBox<String> countryCode = new ComboBox<>();
-        private final TextField number = new TextField();
-
-        public PhoneNumberField(String label) {
-            setLabel(label);
-            countryCode.setWidth("120px");
-            countryCode.setPlaceholder("Country");
-            countryCode.setAllowedCharPattern("[\\+\\d]");
-            countryCode.setItems("+354", "+91", "+62", "+98", "+964", "+353", "+44", "+972", "+39", "+225");
-            countryCode.addCustomValueSetListener(e -> countryCode.setValue(e.getDetail()));
-            number.setAllowedCharPattern("\\d");
-            HorizontalLayout layout = new HorizontalLayout(countryCode, number);
-            layout.setFlexGrow(1.0, number);
-            add(layout);
-        }
-
-        @Override
-        protected String generateModelValue() {
-            if (countryCode.getValue() != null && number.getValue() != null) {
-                String s = countryCode.getValue() + " " + number.getValue();
-                return s;
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        if (authenticatedUser.get().isPresent()) {
+            User user = authenticatedUser.get().get();
+            if (user.getRole() != Role.ADMIN) {
+                beforeEnterEvent.forwardTo("");
             }
-            return "";
-        }
-
-        @Override
-        protected void setPresentationValue(String phoneNumber) {
-            String[] parts = phoneNumber != null ? phoneNumber.split(" ", 2) : new String[0];
-            if (parts.length == 1) {
-                countryCode.clear();
-                number.setValue(parts[0]);
-            } else if (parts.length == 2) {
-                countryCode.setValue(parts[0]);
-                number.setValue(parts[1]);
-            } else {
-                countryCode.clear();
-                number.clear();
-            }
+        } else if (userService.hasAdminUsers()) {
+            beforeEnterEvent.forwardTo("/login");
         }
     }
-
 }

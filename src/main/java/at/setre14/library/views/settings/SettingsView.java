@@ -12,8 +12,8 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+import javax.annotation.security.RolesAllowed;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import java.util.zip.ZipInputStream;
 
 @PageTitle("Settings")
 @Route(value = "settings", layout = MainLayout.class)
-@AnonymousAllowed
+@RolesAllowed({"ADMIN", "USER"})
 public class SettingsView extends VerticalLayout {
 
     private final CalibreService calibreService;
@@ -104,7 +104,6 @@ public class SettingsView extends VerticalLayout {
 
                 calibreImport = this.calibreService.importDb(extracedFolder.toString());
                 System.out.println(calibreImport);
-
 
 
                 Files.walk(extracedFolder)

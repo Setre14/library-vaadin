@@ -2,21 +2,26 @@ package at.setre14.library.data.user;
 
 import at.setre14.library.data.Role;
 import at.setre14.library.data.dbitem.DbItem;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
-import java.util.Set;
 
 @Getter
 @Setter
 @Document
+@ToString
 public class User extends DbItem {
+    @Transient
+    private String password;
     private String hashedPassword;
-    private Set<Role> roles;
+    private Role role;
+
+    public User() {
+        super();
+    }
 
     public User(String name, String hashedPassword) {
         super(name);

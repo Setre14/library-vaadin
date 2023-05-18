@@ -9,11 +9,11 @@ import at.setre14.library.data.series.Series;
 import at.setre14.library.data.series.SeriesService;
 import at.setre14.library.data.tag.Tag;
 import at.setre14.library.data.tag.TagService;
+import at.setre14.library.data.user.User;
 import at.setre14.library.data.userbooksettings.UserBookSetting;
 import at.setre14.library.data.userbooksettings.UserBookSettingService;
 import at.setre14.library.model.Language;
 import at.setre14.library.model.ReadingStatus;
-import at.setre14.library.data.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -43,12 +43,23 @@ import static java.util.Map.entry;
 @Slf4j
 public class CalibreService {
 
+    private static final String METADATA_FILE = "metadata.opf";
+    private static final Map<String, String> DESCRIPTION_TAGS = Map.ofEntries(
+            entry("<div>", ""),
+            entry("</div>", "\n"),
+            entry("<br>", "\n"),
+            entry("<p>", ""),
+            entry("<p align=\"justify\">", ""),
+            entry("</p>", "\n")
+    );
+    private static final String VALUE_FIELD = "#value#";
+    private static final String DISPLAY_FIELD = "display";
+    private static final String DEFAULT_VALUE_FIELD = "default_value";
     private final AuthorService authorService;
     private final BookService bookService;
     private final SeriesService seriesService;
     private final TagService tagService;
     private final UserBookSettingService userBookSettingService;
-
     public CalibreService(AuthorService authorService, BookService bookService, SeriesService seriesService, TagService tagService, UserBookSettingService userBookSettingService) {
         this.authorService = authorService;
         this.bookService = bookService;
@@ -57,19 +68,91 @@ public class CalibreService {
         this.userBookSettingService = userBookSettingService;
     }
 
-    private static final String METADATA_FILE = "metadata.opf";
-    private static final Map<String, String> DESCRIPTION_TAGS = Map.ofEntries(
-        entry("<div>", ""),
-        entry("</div>", "\n"),
-        entry("<br>", "\n"),
-        entry("<p>", ""),
-        entry("<p align=\"justify\">", ""),
-        entry("</p>", "\n")
-    );
+    private static <T extends DbItem> Map<String, T> createLookupMap(List<T> list, Function<T, String> func) {
+        return list.stream().collect(Collectors.toMap(func, Function.identity()));
+    }
 
-    private static final String VALUE_FIELD = "#value#";
-    private static final String DISPLAY_FIELD = "display";
-    private static final String DEFAULT_VALUE_FIELD = "default_value";
+    private static Set<File> listDirs(String path) {
+        return listDirs(new File(path));
+    }
+
+    private static Set<File> listDirs(@NonNull File path) {
+        return Arrays.stream(path.listFiles())
+                .filter(File::isDirectory)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<File> listFiles(File path) {
+        return Arrays.stream(path.listFiles())
+                .filter(file -> !file.isDirectory())
+                .collect(Collectors.toSet());
+    }
+
+    private static NodeList getElements(Document doc, CalibreTag tag) {
+        return doc.getElementsByTagName(tag.tag);
+    }
+
+    private static String getElement(Document doc, CalibreTag tag) {
+        Node element = getElements(doc, tag).item(0);
+        return element != null ? element.getTextContent() : null;
+    }
+
+    private static String getNamedItem(NamedNodeMap attributes, CalibreAttribute attribute) {
+        return attributes.getNamedItem(attribute.attribute).getTextContent();
+    }
+
+    private static UserBookSetting getUserBookSetting(Map<String, UserBookSetting> userBookSettingMap, String userId, String bookId) {
+        UserBookSetting userBookSetting = userBookSettingMap.get(userId);
+
+        if (userBookSetting == null) {
+            userBookSetting = new UserBookSetting(userId, bookId);
+            userBookSettingMap.put(userId, userBookSetting);
+        }
+
+        return userBookSetting;
+    }
+
+    private static String getCustomValue(String content, String defaultValue) {
+        String returnValue = defaultValue;
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            Map<String, Object> map = mapper.readValue(content, Map.class);
+
+            String value = getMapValue(map, VALUE_FIELD);
+            if (value != null) {
+                returnValue = value;
+            } else {
+                Map<String, Object> displayMap = (Map<String, Object>) map.get(DISPLAY_FIELD);
+                if (displayMap != null) {
+                    String val = getMapValue(displayMap, DEFAULT_VALUE_FIELD);
+                    if (val != null) {
+                        returnValue = val;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return returnValue;
+    }
+
+    private static String getMapValue(Map<String, Object> map, String field) {
+        String value = null;
+        if (map.containsKey(field)) {
+            Object val = map.get(field);
+            if (val != null) {
+                value = val.toString();
+                if (value.equals("null")) {
+                    value = null;
+                }
+            }
+        }
+
+        return value;
+    }
 
     public CalibreImport importDb(String path) throws Exception {
 
@@ -104,8 +187,8 @@ public class CalibreService {
 
             DocumentBuilder db = dbf.newDocumentBuilder();
 
-            for(File authorDir: listDirs(path)) {
-                for(File bookDir: listDirs(authorDir)) {
+            for (File authorDir : listDirs(path)) {
+                for (File bookDir : listDirs(authorDir)) {
                     File metadata = new File(bookDir, METADATA_FILE);
 
                     Document doc = db.parse(metadata);
@@ -147,7 +230,7 @@ public class CalibreService {
 
                     NodeList tagNodes = getElements(doc, CalibreTag.TAG);
 
-                    for(int i = 0; i < tagNodes.getLength(); i++) {
+                    for (int i = 0; i < tagNodes.getLength(); i++) {
                         String tagString = tagNodes.item(i).getTextContent();
                         Tag tag = null;
                         if (tagsMap.containsKey(tagString)) {
@@ -166,10 +249,10 @@ public class CalibreService {
                     NodeList metaNodes = getElements(doc, CalibreTag.META);
 
                     Map<String, UserBookSetting> userBookSettingMap = new HashMap<>();
-                    
+
                     Book book = new Book(title, author, description, language, tags, series, seriesIndex);
 
-                    for(int i = 0; i < metaNodes.getLength(); i++) {
+                    for (int i = 0; i < metaNodes.getLength(); i++) {
                         Node metaNode = metaNodes.item(i);
                         NamedNodeMap attributes = metaNode.getAttributes();
                         String name = getNamedItem(attributes, CalibreAttribute.NAME);
@@ -177,7 +260,7 @@ public class CalibreService {
                         CalibreMetaName metaName = CalibreMetaName.get(name);
                         String content = getNamedItem(attributes, CalibreAttribute.CONTENT);
 
-                        if(metaName != null) {
+                        if (metaName != null) {
                             switch (metaName) {
                                 case SERIES -> {
                                     if (seriesMap.containsKey(content)) {
@@ -191,20 +274,20 @@ public class CalibreService {
                                 }
                                 case SERIES_INDEX -> book.setSeriesIndex(Integer.parseInt(content));
                                 case READ_SIMON -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
+                                    UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
                                     userBookSetting.setStatus(ReadingStatus.get(getCustomValue(content, "false").equals("true")));
                                 }
                                 case RATING_SIMON -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
-                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0"))/2f);
+                                    UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, simon.getId(), book.getId());
+                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0")) / 2f);
                                 }
                                 case READ_TAMARA -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
+                                    UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
                                     userBookSetting.setStatus(ReadingStatus.get(getCustomValue(content, "false").equals("true")));
                                 }
                                 case RATING_TAMARA -> {
-                                    UserBookSetting userBookSetting =  getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
-                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0"))/2f);
+                                    UserBookSetting userBookSetting = getUserBookSetting(userBookSettingMap, tamara.getId(), book.getId());
+                                    userBookSetting.setRating(Integer.parseInt(getCustomValue(content, "0")) / 2f);
                                 }
                             }
                         }
@@ -239,91 +322,6 @@ public class CalibreService {
         tagService.saveAll(calibreImport.getTags());
         userBookSettingService.saveAll(calibreImport.getUserBookSettings());
 
-         return calibreImport;
-    }
-
-    private static <T extends DbItem> Map<String, T> createLookupMap(List<T> list, Function<T, String> func) {
-        return list.stream().collect(Collectors.toMap(func, Function.identity()));
-    }
-
-    private static Set<File> listDirs(String path) {
-        return listDirs(new File(path));
-    }
-    private static Set<File> listDirs(@NonNull File path) {
-        return Arrays.stream(path.listFiles())
-                .filter(File::isDirectory)
-                .collect(Collectors.toSet());
-    }
-
-    private static Set<File> listFiles(File path) {
-        return Arrays.stream(path.listFiles())
-                .filter(file -> !file.isDirectory())
-                .collect(Collectors.toSet());
-    }
-
-    private static NodeList getElements(Document doc, CalibreTag tag) {
-        return doc.getElementsByTagName(tag.tag);
-    }
-
-    private static String getElement(Document doc, CalibreTag tag) {
-        Node element = getElements(doc, tag).item(0);
-        return element != null ? element.getTextContent() : null;
-    }
-
-    private static String getNamedItem(NamedNodeMap attributes, CalibreAttribute attribute) {
-        return attributes.getNamedItem(attribute.attribute).getTextContent();
-    }
-
-    private static UserBookSetting getUserBookSetting(Map<String, UserBookSetting> userBookSettingMap, String userId, String bookId) {
-        UserBookSetting userBookSetting = userBookSettingMap.get(userId);
-
-        if(userBookSetting == null) {
-            userBookSetting = new UserBookSetting(userId, bookId);
-            userBookSettingMap.put(userId, userBookSetting);
-        }
-
-        return userBookSetting;
-    }
-
-    private static String getCustomValue(String content, String defaultValue) {
-        String returnValue = defaultValue;
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            Map<String, Object> map = mapper.readValue(content, Map.class);
-
-            String value = getMapValue(map, VALUE_FIELD);
-            if(value != null) {
-                returnValue = value;
-            } else {
-                Map<String, Object> displayMap = (Map<String, Object>) map.get(DISPLAY_FIELD);
-                if(displayMap != null) {
-                    String val = getMapValue(displayMap, DEFAULT_VALUE_FIELD);
-                    if(val != null) {
-                        returnValue = val;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return returnValue;
-    }
-
-    private static String getMapValue(Map<String, Object> map, String field) {
-        String value = null;
-        if (map.containsKey(field)) {
-            Object val = map.get(field);
-            if(val != null) {
-                value = val.toString();
-                if(value.equals("null")) {
-                    value = null;
-                }
-            }
-        }
-
-        return value;
+        return calibreImport;
     }
 }

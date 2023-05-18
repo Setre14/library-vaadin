@@ -10,12 +10,13 @@ public enum CalibreMetaName {
 
 
     String name;
+
     CalibreMetaName(String name) {
         this.name = name;
     }
 
     static CalibreMetaName get(String name) {
-        for(CalibreMetaName metaName: CalibreMetaName.values()) {
+        for (CalibreMetaName metaName : CalibreMetaName.values()) {
             if (metaName.name.equals(name)) {
                 return metaName;
             }

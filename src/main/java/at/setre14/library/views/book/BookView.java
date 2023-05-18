@@ -21,14 +21,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import javax.annotation.security.RolesAllowed;
 
 @PageTitle("Book")
 @Route(value = "book", layout = MainLayout.class)
-@AnonymousAllowed
-//@RolesAllowed("USER")
+@RolesAllowed({"ADMIN", "USER"})
 @Uses(Icon.class)
 public class BookView extends DbItemView<Book> {
 
@@ -50,7 +48,7 @@ public class BookView extends DbItemView<Book> {
         createRow(descriptionList, "Description", String.valueOf(item.getDescription()));
 
         createLinkRow(descriptionList, "Author", item.getAuthor(), AuthorView.class);
-        if(item.getSeries() != null) {
+        if (item.getSeries() != null) {
             createLinkRow(descriptionList, "Series", item.getSeries(), SeriesView.class);
             createRow(descriptionList, "Series Index", String.valueOf(item.getSeriesIndex()));
         }

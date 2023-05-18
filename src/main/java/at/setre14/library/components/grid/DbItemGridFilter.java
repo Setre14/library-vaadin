@@ -68,7 +68,7 @@ public class DbItemGridFilter<T extends DbItem> extends Div {
 
         nameFilterTextField.setPlaceholder("filter");
         nameFilterTextField.addKeyUpListener(e -> {
-            if(Key.ENTER.equals(e.getKey())) {
+            if (Key.ENTER.equals(e.getKey())) {
                 onSearch.run();
             }
         });

@@ -11,14 +11,12 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import javax.annotation.security.RolesAllowed;
 
 @PageTitle("Tags")
 @Route(value = "tag", layout = MainLayout.class)
-@AnonymousAllowed
-// @RolesAllowed("USER")
+@RolesAllowed({"ADMIN", "USER"})
 @Uses(Icon.class)
 public class TagView extends DbItemView<Tag> {
 

@@ -17,12 +17,12 @@ import java.util.function.Function;
 
 public class DbItemGrid<T extends DbItem> extends Div {
 
-    protected Grid<T> grid;
-    protected DbItemGridFilter<T> filter;
-    protected Paginator paginator;
     protected final DbItemService<T> service;
     private final Class<T> itemClass;
     private final Class<? extends DbItemView<T>> itemViewClass;
+    protected Grid<T> grid;
+    protected DbItemGridFilter<T> filter;
+    protected Paginator paginator;
 
     public DbItemGrid(DbItemService<T> service, Class<T> itemClass, Class<? extends DbItemView<T>> itemViewClass) {
         this.service = service;

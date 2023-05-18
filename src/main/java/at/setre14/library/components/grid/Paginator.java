@@ -11,13 +11,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 public class Paginator extends Div {
+    private final IntegerField pageNumberIntegerField = new IntegerField();
+    private final Span pagesTotalSpan = new Span("1");
+    private final Runnable onUpdate;
     private int pageNumber = 1;
     private int pagesTotal = 1;
-    private final IntegerField pageNumberIntegerField = new IntegerField();
-
-    private final Span pagesTotalSpan = new Span("1");
-
-    private final Runnable onUpdate;
 
     public Paginator(Runnable onUpdate) {
         this.onUpdate = onUpdate;
@@ -28,9 +26,9 @@ public class Paginator extends Div {
         pageNumberIntegerField.setValue(pageNumber);
 
         pageNumberIntegerField.addKeyUpListener(e -> {
-            if(Key.ENTER.equals(e.getKey())) {
+            if (Key.ENTER.equals(e.getKey())) {
                 pageNumber = pageNumberIntegerField.getValue();
-                if(pageNumber < 1) {
+                if (pageNumber < 1) {
                     pageNumber = 1;
                 } else if (pageNumber > pagesTotal) {
                     pageNumber = pagesTotal;
@@ -42,7 +40,7 @@ public class Paginator extends Div {
 
         Button prevPageButton = new Button("<");
         prevPageButton.addClickListener(e -> {
-            if(pageNumber > 1) {
+            if (pageNumber > 1) {
                 pageNumber--;
                 pageNumberIntegerField.setValue(pageNumber);
                 onUpdate.run();
@@ -53,7 +51,7 @@ public class Paginator extends Div {
 
         Button nextPageButton = new Button(">");
         nextPageButton.addClickListener(e -> {
-            if(pageNumber < pagesTotal) {
+            if (pageNumber < pagesTotal) {
                 pageNumber++;
                 pageNumberIntegerField.setValue(pageNumber);
                 onUpdate.run();
@@ -67,7 +65,7 @@ public class Paginator extends Div {
 
     public PageRequest getPageRequest(Sort.Order order) {
         int pageSize = 20;
-        return PageRequest.of(pageNumber-1, pageSize, Sort.by(order));
+        return PageRequest.of(pageNumber - 1, pageSize, Sort.by(order));
     }
 
     public <T> void update(Page<T> page) {
@@ -80,7 +78,7 @@ public class Paginator extends Div {
     }
 
     public void validate() {
-        if(pageNumber > pagesTotal) {
+        if (pageNumber > pagesTotal) {
             pageNumber = pagesTotal;
             pageNumberIntegerField.setValue(pageNumber);
             onUpdate.run();

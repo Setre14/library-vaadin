@@ -9,5 +9,5 @@ public class AuthorService extends DbItemService<Author> {
     public AuthorService(AuthorRepository repository) {
         super(repository);
     }
-    
+
 }

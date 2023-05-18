@@ -53,7 +53,7 @@ public class BookGridFilter extends DbItemGridFilter<Book> {
 
         nameFilterTextField.setPlaceholder("filter");
         nameFilterTextField.addKeyUpListener(e -> {
-            if(Key.ENTER.equals(e.getKey())) {
+            if (Key.ENTER.equals(e.getKey())) {
                 onSearch.run();
             }
         });
@@ -62,21 +62,21 @@ public class BookGridFilter extends DbItemGridFilter<Book> {
 
         List<Component> filterComboBoxes = new ArrayList<>();
 
-        if(!itemClassName.equals("Author")) {
+        if (!itemClassName.equals("Author")) {
             authorComboBox.setLabel("Author");
             authorComboBox.setPlaceholder("Select Author");
             authorComboBox.setItems(authorService.findAll());
             filterComboBoxes.add(authorComboBox);
         }
 
-        if(!itemClassName.equals("Series")) {
+        if (!itemClassName.equals("Series")) {
             seriesComboBox.setLabel("Series");
             seriesComboBox.setPlaceholder("Select Series");
             seriesComboBox.setItems(seriesService.findAll());
             filterComboBoxes.add(seriesComboBox);
         }
 
-        if(!itemClassName.equals("Tag")) {
+        if (!itemClassName.equals("Tag")) {
             tagComboBox.setLabel("Tag");
             tagComboBox.setPlaceholder("Select Tag");
             tagComboBox.setItems(tagService.findAll());
@@ -111,9 +111,11 @@ public class BookGridFilter extends DbItemGridFilter<Book> {
     public Author getAuthorFilter() {
         return item != null && item.getClass().getSimpleName().equals("Author") ? (Author) item : authorComboBox.getValue();
     }
+
     public Series getSeriesFilter() {
         return item != null && item.getClass().getSimpleName().equals("Series") ? (Series) item : seriesComboBox.getValue();
     }
+
     public Tag getTagFilter() {
         return item != null && item.getClass().getSimpleName().equals("Tag") ? (Tag) item : tagComboBox.getValue();
     }

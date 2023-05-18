@@ -70,7 +70,7 @@ public class Book extends DbItem {
         this.description = description;
         this.language = language;
         this.tagIds = tagIds.stream().map(DbItem::getId).collect(Collectors.toList());
-        this.seriesId = seriesId != null ? seriesId.getId(): null;
+        this.seriesId = seriesId != null ? seriesId.getId() : null;
         this.seriesIndex = seriesIndex;
     }
 
@@ -79,7 +79,7 @@ public class Book extends DbItem {
     }
 
     public List<Tag> getSortedTags() {
-        if(this.tags != null) {
+        if (this.tags != null) {
             return tags.stream().sorted(Comparator.comparing(a -> a.getName().toLowerCase())).toList();
         }
         return new ArrayList<>();

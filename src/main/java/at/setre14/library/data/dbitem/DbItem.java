@@ -17,8 +17,8 @@ public abstract class DbItem {
 
     protected DbItem() {
         this.id = UUID.randomUUID().toString();
-        this.name = "name";
     }
+
     protected DbItem(String name) {
         this();
         this.name = name;

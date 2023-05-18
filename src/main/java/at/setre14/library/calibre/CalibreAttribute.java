@@ -5,6 +5,7 @@ public enum CalibreAttribute {
     NAME("name");
 
     String attribute;
+
     CalibreAttribute(String attribute) {
         this.attribute = attribute;
     }

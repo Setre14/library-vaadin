@@ -8,8 +8,8 @@ spring:
 #      host: home-server:27017
       port: 27017
       authentication-database: admin
-      username: user
-      password: password
+      username: fCEomFgy249GFq
+      password: fCEomFgy249GFq
       database: library-dev
 
   # jpa:

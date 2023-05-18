@@ -30,7 +30,6 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import javax.annotation.security.RolesAllowed;
 import java.io.InputStream;
@@ -40,8 +39,8 @@ import java.util.List;
 
 @PageTitle("Book Edit")
 @Route(value = "book-edit", layout = MainLayout.class)
-@AnonymousAllowed
-// @RolesAllowed("USER")
+@RolesAllowed({"ADMIN", "USER"})
+
 @Uses(Icon.class)
 public class BookEditView extends Div {
 
@@ -57,7 +56,7 @@ public class BookEditView extends Div {
     private final IntegerField pageIntegerField = new IntegerField("Page");
     private final TextField ratingTextfield = new TextField("Rating");
     private final MultiSelectComboBox<Tag> tagsMultiSelectComboBox = new MultiSelectComboBox<>("Tags");
-//    private TextField ebook = new TextField("Email address");
+    //    private TextField ebook = new TextField("Email address");
 //
     private final MemoryBuffer buffer = new MemoryBuffer();
     private final Upload ebook = new Upload(buffer);

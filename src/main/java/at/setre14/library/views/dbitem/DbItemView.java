@@ -38,7 +38,7 @@ public abstract class DbItemView<T extends DbItem> extends Div implements HasUrl
     }
 
     @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter String id)  {
+    public void setParameter(BeforeEvent event, @OptionalParameter String id) {
 
         if (id == null) {
             this.item = createItem();
@@ -56,7 +56,7 @@ public abstract class DbItemView<T extends DbItem> extends Div implements HasUrl
     protected void createPage() {
         VerticalLayout layout = new VerticalLayout();
 
-        if(item != null) {
+        if (item != null) {
             createFoundPage(layout);
         } else {
             createNotFoundPage(layout);

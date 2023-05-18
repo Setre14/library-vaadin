@@ -8,11 +8,12 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+
+import javax.annotation.security.RolesAllowed;
 
 @PageTitle("Authors")
 @Route(value = "author-list", layout = MainLayout.class)
-@AnonymousAllowed
+@RolesAllowed({"ADMIN", "USER"})
 @Uses(Icon.class)
 public class AuthorListView extends DbItemListView<Author> {
     public AuthorListView(AuthorService authorService) {

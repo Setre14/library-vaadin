@@ -9,6 +9,7 @@ public enum CalibreTag {
     TITLE("dc:title");
 
     String tag;
+
     CalibreTag(String tag) {
         this.tag = tag;
     }

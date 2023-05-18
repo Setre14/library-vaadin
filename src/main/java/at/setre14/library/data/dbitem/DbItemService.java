@@ -18,10 +18,12 @@ public abstract class DbItemService<T extends DbItem> {
     public DbItemService(DbItemRepository<T> repository) {
         this.repository = repository;
     }
+
     public List<T> findAll() {
         Sort.Order order = new Sort.Order(Sort.Direction.ASC, "name");
         return repository.findAll(Sort.by(order));
     }
+
     public Page<T> list(Pageable pageable) {
         return repository.findAll(pageable);
     }
@@ -52,6 +54,7 @@ public abstract class DbItemService<T extends DbItem> {
     public void save(T item) {
         repository.save(item);
     }
+
     public void saveAll(Iterable<T> items) {
         repository.saveAll(items);
     }

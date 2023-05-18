@@ -1,6 +1,5 @@
 package at.setre14.library.components.grid;
 
-import at.setre14.library.data.author.Author;
 import at.setre14.library.data.author.AuthorService;
 import at.setre14.library.data.book.Book;
 import at.setre14.library.data.book.BookService;
@@ -18,8 +17,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 
 public class BookGrid extends DbItemGrid<Book> {
     private final AuthorService authorService;
@@ -65,7 +62,7 @@ public class BookGrid extends DbItemGrid<Book> {
     private ComponentRenderer<HorizontalLayout, Book> createTagsComponentRenderer() {
         return new ComponentRenderer<>(book -> {
             HorizontalLayout horizontalLayout = new HorizontalLayout();
-            for(Tag tag: book.getSortedTags()) {
+            for (Tag tag : book.getSortedTags()) {
                 RouterLink link = new RouterLink(tag.toString(), TagView.class, tag.getId());
                 link.addClassName("black-link");
                 link.getElement().getThemeList().add("badge contrast");
